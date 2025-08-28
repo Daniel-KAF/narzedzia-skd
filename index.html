@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Narzędzia KAF</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #333;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            padding: 40px;
+            background-color: #424242;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #e0e0e0;
+            margin-bottom: 30px;
+        }
+        .button-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .button {
+            display: block;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            min-width: 250px;
+        }
+        .btn-calculator {
+            background-color: #4caf50;
+        }
+        .btn-calculator:hover {
+            background-color: #45a049;
+        }
+        .btn-generator {
+            background-color: #0288d1;
+        }
+        .btn-generator:hover {
+            background-color: #0277bd;
+        }
+        /* Nowy styl dla przycisku WPS */
+        .btn-wps {
+            background-color: #f57c00; /* Pomarańczowy */
+        }
+        .btn-wps:hover {
+            background-color: #e65100;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Wybierz narzędzie</h1>
+        <div class="button-wrapper">
+            <a href="kalkulator.html" class="button btn-calculator">Kalkulator Zysku</a>
+            <a href="generator.html" class="button btn-generator">Generator Ofert</a>
+            <a href="kalkulator-wps.html" class="button btn-wps">Kalkulator WPS</a>
+        </div>
+    </div>
+</body>
+</html>

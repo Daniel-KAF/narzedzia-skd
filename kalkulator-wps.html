@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator WPS</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #333;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #424242;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            text-align: center;
+            color: #e0e0e0;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .input-section, .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .input-group {
+            background-color: #525252;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background-color: #616161;
+            color: #f0f0f0;
+            border: 1px solid #757575;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .results-section {
+            gap: 12px;
+        }
+        .result-box {
+            background-color: #3a3a3a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #555; /* Domyślny, stonowany border */
+        }
+        .result-label {
+            font-size: 14px;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin: 0;
+        }
+        .result-value {
+            font-size: 26px;
+            font-weight: 600;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* === NOWE, ZRÓŻNICOWANE STYLE WYNIKÓW === */
+
+        /* Styl dla WPS - najważniejszy wynik */
+        .result-box.wps-highlight {
+            border-left-color: #81c784; /* Jaśniejszy zielony akcent */
+        }
+        .result-value.wps-value {
+            color: #81c784; /* Jaśniejszy zielony */
+            font-weight: 700; /* Pogrubienie */
+            font-size: 28px; /* Nieco większa czcionka */
+        }
+
+        /* Styl dla pozostałych, mniej ważnych wyników */
+        .result-value.secondary-value {
+            color: #bdbdbd; /* Stonowany szary kolor */
+            font-weight: 500;
+        }
+
+
+        @media (max-width: 800px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .result-box { flex-direction: column; align-items: flex-start; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Kalkulator Wartości Przedmiotu Sporu (SKD)</h2>
+
+    <div class="main-grid">
+        <div class="input-section">
+            <div class="input-group">
+                <label for="kwotaKredytu">Kwota kredytu (tylko kapitał)</label>
+                <input type="number" id="kwotaKredytu" value="100000" oninput="calculateWPS()">
+            </div>
+            <div class="input-group">
+                <label for="prowizja">Prowizja w umowie (kwotowo)</label>
+                <input type="number" id="prowizja" value="2560" oninput="calculateWPS()">
+            </div>
+            <div class="input-group">
+                <label for="oprocentowanie">Oprocentowanie (%)</label>
+                <input type="number" id="oprocentowanie" value="12.99" step="0.01" oninput="calculateWPS()">
+            </div>
+            <div class="input-group">
+                <label for="okresSplaty">Okres spłaty (msc)</label>
+                <input type="number" id="okresSplaty" value="120" oninput="calculateWPS()">
+            </div>
+            <div class="input-group">
+                <label for="dataPodpisania">Data podpisania umowy</label>
+                <input type="date" id="dataPodpisania" oninput="calculateWPS()">
+            </div>
+            <div class="input-group">
+                <label for="dataSymulacji">Data dzisiejsza (do symulacji WPS)</label>
+                <input type="date" id="dataSymulacji" oninput="calculateWPS()">
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="result-box">
+                <p class="result-label">ODSETKI CAŁKOWITE</p>
+                <p class="result-value secondary-value" id="wynikOdsetkiCalkowite">0,00 zł</p>
+            </div>
+            <div class="result-box wps-highlight">
+                <p class="result-label">WPS (w trakcie spłaty)</p>
+                <p class="result-value wps-value" id="wynikWpsWTrakcie">0,00 zł</p>
+            </div>
+            <div class="result-box">
+                <p class="result-label">Przyszłe umorzone odsetki</p>
+                <p class="result-value secondary-value" id="wynikUmorzoneOdsetki">0,00 zł</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Cały skrypt JavaScript pozostaje bez zmian
+    const formatCurrency = (value) => (value || 0).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
+    const getValue = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+    function dateDiffInMonths_DATEDIF(startDate, endDate) {
+        if (!startDate || !endDate || endDate < startDate) return 0;
+        let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+        months -= startDate.getMonth();
+        months += endDate.getMonth();
+        
+        if (endDate.getDate() < startDate.getDate()) {
+            months--;
+        }
+        return months < 0 ? 0 : months;
+    }
+    
+    function calculateWPS() {
+        const P_base = getValue('kwotaKredytu');
+        const prowizja = getValue('prowizja');
+        const rocznaStopa = getValue('oprocentowanie');
+        const n = getValue('okresSplaty');
+        
+        const P_financed = P_base + prowizja;
+
+        const dataPodpisaniaStr = document.getElementById('dataPodpisania').value;
+        const dataSymulacjiStr = document.getElementById('dataSymulacji').value;
+
+        if (!dataPodpisaniaStr || !dataSymulacjiStr) return;
+
+        const dataPodpisania = new Date(dataPodpisaniaStr);
+        const dataSymulacji = new Date(dataSymulacjiStr);
+        
+        const r = (rocznaStopa / 100) / 12;
+        let calyHarmonogram = [];
+        
+        if (P_financed > 0 && n > 0 && r > 0) {
+            const pmt = P_financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            let miesiecznaRata = Math.round(pmt * 100) / 100;
+            
+            let pozostalyKapital = P_financed;
+            for(let i = 0; i < n; i++){
+                let odsetki = Math.round((pozostalyKapital * r) * 100) / 100;
+                let rataDoSpłaty = miesiecznaRata;
+                if (i === n - 1) {
+                    rataDoSpłaty = pozostalyKapital + odsetki;
+                }
+                calyHarmonogram.push(odsetki);
+                let kapital = rataDoSpłaty - odsetki;
+                pozostalyKapital -= kapital;
+            }
+        }
+        
+        const odsetkiCalkowite = calyHarmonogram.reduce((a, b) => a + b, 0);
+        const pelneRatyDoWPS = dateDiffInMonths_DATEDIF(dataPodpisania, dataSymulacji);
+        
+        let odsetkiSplaconeDoWPS = 0;
+        if(calyHarmonogram.length > 0){
+            odsetkiSplaconeDoWPS = calyHarmonogram.slice(0, pelneRatyDoWPS).reduce((a, b) => a + b, 0);
+        }
+        
+        const wpsWTrakcie = prowizja + odsetkiSplaconeDoWPS;
+        const umorzoneOdsetki = odsetkiCalkowite - odsetkiSplaconeDoWPS;
+
+        document.getElementById('wynikOdsetkiCalkowite').textContent = formatCurrency(odsetkiCalkowite);
+        document.getElementById('wynikWpsWTrakcie').textContent = formatCurrency(wpsWTrakcie);
+        document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(umorzoneOdsetki);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('dataPodpisania').value = "2022-06-08";
+        document.getElementById('dataSymulacji').value = "2025-08-28";
+        
+        calculateWPS();
+    });
+</script>
+</body>
+</html>
