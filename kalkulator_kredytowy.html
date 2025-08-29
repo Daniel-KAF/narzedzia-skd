@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Kredytowy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f8f6; /* Kremowo-zielone tło */
+            color: #2d3748;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px; /* Zmniejszony dla lepszego układu jednokolumnowego */
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(46, 139, 87, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        h2 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        /* Sekcja z polami do wprowadzania danych */
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #718096;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #fdfdff;
+            color: #2d3748;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4A934A; /* Zielony akcent */
+            box-shadow: 0 0 0 3px rgba(74, 147, 74, 0.15);
+        }
+        
+        /* Nowa sekcja wyników w formie siatki kart */
+        .results-grid {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+        }
+        .result-card {
+            background-color: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .result-label {
+            font-size: 14px;
+            color: #718096;
+            margin: 0 0 5px 0;
+        }
+        .result-value {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        /* Wyróżnienie głównego wyniku */
+        .result-card.highlight {
+            grid-column: 1 / -1; /* Karta na całą szerokość */
+            text-align: center;
+            background-color: #4A934A; /* Główny zielony kolor */
+            color: #fff;
+            border: none;
+        }
+        .result-card.highlight .result-label {
+            color: #e2f0e2;
+        }
+        .result-card.highlight .result-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .input-section, .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Kalkulator Kredytowy</h2>
+
+    <div class="input-section">
+        <div class="input-group">
+            <label for="kwota">Kwota kredytu (zł)</label>
+            <input type="number" id="kwota" value="100000" oninput="obliczKredyt()">
+        </div>
+        <div class="input-group">
+            <label for="okres">Okres (miesiące)</label>
+            <input type="number" id="okres" value="120" oninput="obliczKredyt()">
+        </div>
+        <div class="input-group">
+            <label for="oprocentowanie">Oprocentowanie (%)</label>
+            <input type="number" id="oprocentowanie" value="8.99" step="0.01" oninput="obliczKredyt()">
+        </div>
+        <div class="input-group">
+            <label for="prowizja">Prowizja (%)</label>
+            <input type="number" id="prowizja" value="2.39" step="0.01" oninput="obliczKredyt()">
+        </div>
+    </div>
+
+    <div class="results-grid">
+        <div class="result-card highlight">
+            <p class="result-label">Miesięczna rata</p>
+            <p class="result-value" id="wynikRata">0,00 zł</p>
+        </div>
+        <div class="result-card">
+            <p class="result-label">Koszt odsetek</p>
+            <p class="result-value" id="wynikOdsetki">0,00 zł</p>
+        </div>
+         <div class="result-card">
+            <p class="result-label">Koszt prowizji</p>
+            <p class="result-value" id="wynikProwizja">0,00 zł</p>
+        </div>
+        <div class="result-card" style="grid-column: 1 / -1;">
+            <p class="result-label">Całkowita kwota do spłaty</p>
+            <p class="result-value" id="wynikKwotaDoSplaty">0,00 zł</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const formatCurrency = (value) => (value || 0).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
+    const getValue = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+    function obliczKredyt() {
+        const kwota = getValue('kwota');
+        const rocznaStopa = getValue('oprocentowanie');
+        const n = getValue('okres');
+        const prowizjaProc = getValue('prowizja');
+
+        const kwotaProwizji = kwota * (prowizjaProc / 100);
+        const P_financed = kwota + kwotaProwizji;
+        const r = (rocznaStopa / 100) / 12;
+        
+        let miesiecznaRata = 0;
+        let calkowitaKwotaDoSplaty = 0;
+        let calkowityKosztOdsetek = 0;
+
+        if (P_financed > 0 && n > 0 && r > 0) {
+            const pmt = P_financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            miesiecznaRata = Math.round(pmt * 100) / 100;
+
+            calkowitaKwotaDoSplaty = miesiecznaRata * n;
+            calkowityKosztOdsetek = calkowitaKwotaDoSplaty - P_financed;
+        }
+        
+        document.getElementById('wynikRata').textContent = formatCurrency(miesiecznaRata);
+        document.getElementById('wynikOdsetki').textContent = formatCurrency(calkowityKosztOdsetek);
+        document.getElementById('wynikProwizja').textContent = formatCurrency(kwotaProwizji);
+        document.getElementById('wynikKwotaDoSplaty').textContent = formatCurrency(calkowitaKwotaDoSplaty);
+    }
+
+    document.addEventListener('DOMContentLoaded', obliczKredyt);
+</script>
+</body>
+</html>
