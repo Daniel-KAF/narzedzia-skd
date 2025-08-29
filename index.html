@@ -16,15 +16,27 @@
             margin: 0;
             text-align: center;
         }
-        .container {
+        .main-container {
+            display: flex;
+            gap: 40px; /* Odstęp między kolumnami */
             padding: 40px;
             background-color: #424242;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
+        .tool-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         h1 {
             color: #e0e0e0;
+            margin-top: 0;
             margin-bottom: 30px;
+            font-size: 24px;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+            width: 100%;
         }
         .button-wrapper {
             display: flex;
@@ -44,33 +56,32 @@
             transition: background-color 0.2s;
             min-width: 250px;
         }
-        .btn-calculator {
-            background-color: #4caf50;
-        }
-        .btn-calculator:hover {
-            background-color: #45a049;
-        }
-        .btn-generator {
-            background-color: #0288d1;
-        }
-        .btn-generator:hover {
-            background-color: #0277bd;
-        }
-        .btn-wps {
-            background-color: #f57c00;
-        }
-        .btn-wps:hover {
-            background-color: #e65100;
-        }
+        .btn-calculator { background-color: #4caf50; }
+        .btn-calculator:hover { background-color: #45a049; }
+        .btn-generator { background-color: #0288d1; }
+        .btn-generator:hover { background-color: #0277bd; }
+        .btn-wps { background-color: #f57c00; }
+        .btn-wps:hover { background-color: #e65100; }
+        .btn-loan { background-color: #673ab7; }
+        .btn-loan:hover { background-color: #512da8; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Wybierz narzędzie</h1>
-        <div class="button-wrapper">
-            <a href="kalkulator.html" class="button btn-calculator">Kalkulator Zysku</a>
-            <a href="generator-ofert.html" class="button btn-generator">Generator Ofert</a>
-            <a href="kalkulator-wps.html" class="button btn-wps">Kalkulator WPS</a>
+    <div class="main-container">
+        <div class="tool-column">
+            <h1>SKD</h1>
+            <div class="button-wrapper">
+                <a href="kalkulator_zysku.html" class="button btn-calculator">Kalkulator Zysku</a>
+                <a href="generator_ofert.html" class="button btn-generator">Generator Ofert</a>
+                <a href="kalkulator_wps.html" class="button btn-wps">Kalkulator WPS</a>
+            </div>
+        </div>
+
+        <div class="tool-column">
+            <h1>Kredyty</h1>
+            <div class="button-wrapper">
+                <a href="kalkulator_kredytowy.html" class="button btn-loan">Kalkulator Kredytowy</a>
+            </div>
         </div>
     </div>
 </body>
