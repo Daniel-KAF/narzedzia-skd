@@ -5,32 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Kredytowy</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f8f6; /* Kremowo-zielone tło */
-            color: #2d3748;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f1f5f9; /* Stonowane, jasnoszare tło */
+            color: #1e293b; /* Ciemny, grafitowy tekst */
             margin: 0;
             padding: 20px;
         }
         .container {
-            max-width: 600px; /* Zmniejszony dla lepszego układu jednokolumnowego */
+            max-width: 600px;
             margin: 20px auto;
             background-color: #ffffff;
             padding: 40px;
             border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(46, 139, 87, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
         }
         h2 {
             text-align: center;
-            color: #2d3748;
+            color: #1e293b;
             margin-bottom: 30px;
             font-weight: 700;
         }
         
-        /* Sekcja z polami do wprowadzania danych */
         .input-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -45,14 +44,14 @@
             font-weight: 500;
             font-size: 14px;
             margin-bottom: 8px;
-            color: #718096;
+            color: #64748b;
         }
         input {
             width: 100%;
             padding: 12px;
-            background-color: #fdfdff;
-            color: #2d3748;
-            border: 1px solid #cbd5e0;
+            background-color: #f8fafc;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
@@ -60,49 +59,48 @@
         }
         input:focus {
             outline: none;
-            border-color: #4A934A; /* Zielony akcent */
-            box-shadow: 0 0 0 3px rgba(74, 147, 74, 0.15);
+            border-color: #475569;
+            box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.1);
         }
         
-        /* Nowa sekcja wyników w formie siatki kart */
         .results-grid {
             display: grid;
             gap: 15px;
             grid-template-columns: 1fr 1fr;
         }
         .result-card {
-            background-color: #f7fafc;
+            background-color: #f8fafc;
             padding: 20px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
         }
         .result-label {
             font-size: 14px;
-            color: #718096;
+            color: #64748b;
             margin: 0 0 5px 0;
         }
         .result-value {
             font-size: 22px;
             font-weight: 600;
-            color: #2d3748;
+            color: #1e293b;
             margin: 0;
         }
 
-        /* Wyróżnienie głównego wyniku */
+        /* Wyróżnienie głównego wyniku na ciemnym tle */
         .result-card.highlight {
-            grid-column: 1 / -1; /* Karta na całą szerokość */
+            grid-column: 1 / -1;
             text-align: center;
-            background-color: #4A934A; /* Główny zielony kolor */
-            color: #fff;
+            background-color: #1e293b; /* Ciemny grafit */
+            color: #ffffff;
             border: none;
         }
         .result-card.highlight .result-label {
-            color: #e2f0e2;
+            color: #94a3b8; /* Jaśniejszy szary dla etykiety */
         }
         .result-card.highlight .result-value {
             font-size: 42px;
             font-weight: 700;
-            color: #fff;
+            color: #ffffff;
         }
 
         @media (max-width: 600px) {
