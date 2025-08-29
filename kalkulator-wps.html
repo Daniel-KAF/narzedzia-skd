@@ -85,9 +85,6 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* === NOWE, ZRÓŻNICOWANE STYLE WYNIKÓW === */
-
-        /* Styl dla WPS - najważniejszy wynik */
         .result-box.wps-highlight {
             border-left-color: #81c784; /* Jaśniejszy zielony akcent */
         }
@@ -97,12 +94,10 @@
             font-size: 28px; /* Nieco większa czcionka */
         }
 
-        /* Styl dla pozostałych, mniej ważnych wyników */
         .result-value.secondary-value {
             color: #bdbdbd; /* Stonowany szary kolor */
             font-weight: 500;
         }
-
 
         @media (max-width: 800px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -138,7 +133,7 @@
                 <input type="date" id="dataPodpisania" oninput="calculateWPS()">
             </div>
             <div class="input-group">
-                <label for="dataSymulacji">Data dzisiejsza (do symulacji WPS)</label>
+                <label for="dataSymulacji">Data dzisiejsza</label>
                 <input type="date" id="dataSymulacji" oninput="calculateWPS()">
             </div>
         </div>
@@ -161,7 +156,6 @@
 </div>
 
 <script>
-    // Cały skrypt JavaScript pozostaje bez zmian
     const formatCurrency = (value) => (value || 0).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
     const getValue = (id) => parseFloat(document.getElementById(id).value) || 0;
 
@@ -231,7 +225,10 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dataPodpisania').value = "2022-06-08";
-        document.getElementById('dataSymulacji').value = "2025-08-28";
+        
+        // --- KLUCZOWA ZMIANA ---
+        // Poniższy kod automatycznie wstawi dzisiejszą datę
+        document.getElementById('dataSymulacji').value = new Date().toISOString().split('T')[0];
         
         calculateWPS();
     });
