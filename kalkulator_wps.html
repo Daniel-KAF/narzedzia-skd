@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator WPS</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #111827;
@@ -22,10 +22,14 @@
         }
         h2 {
             text-align: center;
-            color: #f9fafb;
             margin-bottom: 30px;
-            font-weight: 700;
+            font-weight: 900;
             font-size: 1.875rem;
+            /* === DODANY STYL GRADIENTU DLA TYTUŁU === */
+            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         .main-grid {
             display: grid;
