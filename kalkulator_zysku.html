@@ -14,9 +14,29 @@
             color: #d1d5db;
             padding: 20px;
         }
-        .header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .logo { height: 50px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-        h1 { text-align: center; font-size: 2.25rem; font-weight: 900; margin-bottom: 20px; background-image: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .logo {
+            height: 50px; /* Zwiększony rozmiar */
+            border-radius: 8px; /* Zaokrąglone rogi */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Cień */
+            border: 1px solid rgba(255,255,255,0.1); /* Delikatna ramka */
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.25rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
         .container {
             width: 100%;
             max-width: 1400px;
@@ -25,36 +45,129 @@
             border: 1px solid #374151;
             padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
-        @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-        .card { background-color: #1f2937; padding: 0; display: flex; flex-direction: column; }
-        .card-content { flex-grow: 1; }
-        .card h3 { margin-top: 0; color: #60a5fa; border-bottom: 1px solid #374151; padding-bottom: 10px; font-size: 1.25rem; font-weight: 600; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 14px; color: #9ca3af; margin-bottom: 5px; }
-        .radio-group label { display: inline-block; margin-right: 15px; font-size: 15px; color: #d1d5db; }
-        input[type="number"] { width: 100%; padding: 10px; background-color: #374151; border: 1px solid #4b5563; border-radius: 4px; color: #f9fafb; font-size: 16px; box-sizing: border-box; }
-        input[readonly] { background-color: #1f2937; color: #6b7280; cursor: not-allowed; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px 0; text-align: left; border-bottom: 1px solid #374151; }
-        th { color: #9ca3af; font-weight: 500; }
-        td { font-weight: 600; font-size: 17px; color: #f9fafb; }
-        .orange { color: #f59e0b; } .green { color: #34d399; } .red { color: #ef4444; }
-        .total-row td { font-size: 18px; border-top: 2px solid #4b5563; }
-        hr { border-color: #374151; margin: 20px 0; }
-        .action-button { font-size: 16px; width: 100%; padding: 12px; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-image 0.2s; margin-top: 10px; font-weight: 600; }
-        #save-pdf-btn { background-image: linear-gradient(to right, #2563eb, #1d4ed8); width: 100%; max-width: 400px; margin: 30px auto 0 auto; display: block; }
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 1100px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .card {
+            background-color: #1f2937;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-content {
+            flex-grow: 1;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #60a5fa;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+        .radio-group label {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 15px;
+            color: #d1d5db;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 4px;
+            color: #f9fafb;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[readonly] {
+            background-color: #1f2937;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 0;
+            text-align: left;
+            border-bottom: 1px solid #374151;
+        }
+        th {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        td {
+            font-weight: 600;
+            font-size: 17px;
+            color: #f9fafb;
+        }
+        .orange { color: #f59e0b; }
+        .green { color: #34d399; }
+        .red { color: #ef4444; }
+        .total-row td {
+            font-size: 18px;
+            border-top: 2px solid #4b5563;
+        }
+        hr {
+            border-color: #374151;
+            margin: 20px 0;
+        }
+        .action-button {
+            font-size: 16px;
+            width: 100%;
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-image 0.2s;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        #save-pdf-btn {
+            background-image: linear-gradient(to right, #2563eb, #1d4ed8);
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto 0 auto;
+            display: block;
+        }
         #save-pdf-btn:hover { background-image: linear-gradient(to right, #1d4ed8, #1e40af); }
         #clear-btn { background-color: #dc2626; }
         #clear-btn:hover { background-color: #b91c1c; }
-        .installment-result { background-color: #111827; border-radius: 6px; padding: 15px; text-align: center; margin-top: 20px; }
+        .installment-result {
+            background-color: #111827;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
         .installment-result .label { font-size: 14px; color: #9ca3af; }
         .installment-result .amount { font-size: 22px; font-weight: bold; color: #34d399; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
     </div>
@@ -62,13 +175,199 @@
 
     <div class="container" id="capture-container">
         <div class="grid">
-             </div>
+            <div class="card">
+                <div class="card-content">
+                    <h3>Dane Wejściowe</h3>
+                    <div class="form-group">
+                        <label for="wps">Wartość Przedmiotu Sporu (WPS)</label>
+                        <input type="number" id="wps" placeholder="np. 25000" oninput="calculate()">
+                    </div>
+                     <div class="form-group">
+                        <label for="interest">Odsetki za opóźnienie (za 1 rok) - [AUTO 10,50% od WPS]</label>
+                        <input type="number" id="interest" readonly>
+                    </div>
+                     <div class="form-group">
+                        <label for="clientShare">Udział Klienta w wygranej (%)</label>
+                        <input type="number" id="clientShare" placeholder="np. 90" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <label for="feeSurplusNet">Nadwyżka na start (Opłata KAF netto)</label>
+                        <input type="number" id="feeSurplusNet" placeholder="np. 5000" oninput="calculate()">
+                    </div>
+                     <div class="form-group">
+                        <label for="forgivenInterest">Odsetki umorzone do przodu dla klienta</label>
+                        <input type="number" id="forgivenInterest" placeholder="np. 0" oninput="calculate()">
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label>Wariant finansowania opłat wstępnych</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="financing" value="lump" onchange="calculate()" checked> Jednorazowo</label>
+                            <label><input type="radio" name="financing" value="5_installments" onchange="calculate()"> 5 rat</label>
+                            <label><input type="radio" name="financing" value="10_installments" onchange="calculate()"> 10 rat</label>
+                            <label><input type="radio" name="financing" value="20_installments" onchange="calculate()"> 20 rat</label>
+                        </div>
+                    </div>
+                    <div class="installment-result">
+                        <div class="label" id="installment-label">Opłata jednorazowa</div>
+                        <div class="amount" id="installment-amount">0,00 PLN</div>
+                    </div>
+                </div>
+                <button id="clear-btn" class="action-button" onclick="clearForm()">Wyczyść</button>
+            </div>
+
+            <div class="card">
+                <h3>Opłaty Klienta</h3>
+                <table>
+                    <thead><tr><th>Opis</th><th>Netto</th><th>Brutto</th></tr></thead>
+                    <tbody>
+                        <tr><th>Opłata sądowa</th><td id="resCourtNet"></td><td id="resCourtGross"></td></tr>
+                        <tr><th>Opłata Miłosz</th><td id="resLawyerNet"></td><td id="resLawyerGross"></td></tr>
+                        <tr><th>Opłata KAF</th><td id="resSurplusNet"></td><td id="resSurplusGross"></td></tr>
+                        <tr class="total-row"><th>Razem</th><td id="resTotalNet"></td><td id="resTotalGross" class="orange"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Zysk Klienta</h3>
+                <table>
+                     <thead><tr><th>Składnik zysku</th><th>Wartość</th></tr></thead>
+                    <tbody>
+                        <tr><th>Etap 1: Zwrot na konto (1 rok)</th><td id="resClientReturn1Y"></td></tr>
+                        <tr><th>Etap 1: Zwrot na konto (2 lata)</th><td id="resClientReturn2Y"></td></tr>
+                        <tr><th>Etap 2: Odsetki umorzone</th><td id="resClientForgiven"></td></tr>
+                        <tr class="total-row"><th>Razem (1 rok)</th><td id="resClientTotal1Y" class="orange"></td></tr>
+                        <tr class="total-row"><th>Razem (2 lata)</th><td id="resClientTotal2Y" class="orange"></td></tr>
+                    </tbody>
+                </table>
+                <hr>
+                <h3>Zysk Kancelarii</h3>
+                <table>
+                    <tbody>
+                         <tr><th>Prowizja operatora</th><td id="resOperatorFee" class="red"></td></tr>
+                         <tr><th>Zysk "Na start" (netto)</th><td id="resFirmStartProfit" class="green"></td></tr>
+                         <tr><th>Success Fee (1 rok)</th><td id="resFirmSF1Y" class="green"></td></tr>
+                         <tr><th>Success Fee (2 lata)</th><td id="resFirmSF2Y" class="green"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
     <button id="save-pdf-btn" class="action-button" onclick="saveAsPDF()">Zapisz jako PDF</button>
 
 <script>
-    // Cały skrypt pozostaje bez zmian
+    const formatCurrency = (value) => {
+        if (typeof value !== 'number' || isNaN(value)) {
+            return "0,00 PLN";
+        }
+        return value.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " PLN";
+    };
+
+    function calculate() {
+        const wps = parseFloat(document.getElementById('wps').value) || 0;
+        const clientShare = parseFloat(document.getElementById('clientShare').value) || 0;
+        const feeSurplusNet = parseFloat(document.getElementById('feeSurplusNet').value) || 0;
+        const forgivenInterest = parseFloat(document.getElementById('forgivenInterest').value) || 0;
+        const financingOption = document.querySelector('input[name="financing"]:checked').value;
+        const interestRate = 0.105;
+        const interest = wps * interestRate;
+        document.getElementById('interest').value = interest.toFixed(2);
+        const feeCourt = 1017.00;
+        const feeLawyerNet = 2250.00;
+        const vatRate = 0.23;
+        const firmShare = 1 - (clientShare / 100);
+        const clientSharePercent = clientShare / 100;
+        const feeLawyerGross = feeLawyerNet * (1 + vatRate);
+        const feeSurplusGross = feeSurplusNet * (1 + vatRate);
+        const totalFeeNet = feeCourt + feeLawyerNet + feeSurplusNet;
+        const totalFeeGross = feeCourt + feeLawyerGross + feeSurplusGross;
+        let commissionRate = 0;
+        if (financingOption === '5_installments' || financingOption === '10_installments') {
+            commissionRate = 0.0449;
+        } else if (financingOption === '20_installments') {
+            commissionRate = 0.0699;
+        }
+        const operatorFee = totalFeeGross * commissionRate;
+        const firmStartProfit = feeSurplusNet - operatorFee;
+        const recovered1Y = wps + interest;
+        const recovered2Y = wps + (interest * 2);
+        const firmSF1Y = recovered1Y * firmShare;
+        const firmSF2Y = recovered2Y * firmShare;
+        const clientReturn1Y = recovered1Y * clientSharePercent;
+        const clientReturn2Y = recovered2Y * clientSharePercent;
+        const forgivenInterestComponent = forgivenInterest * clientSharePercent;
+        const totalClientProfit1Y = clientReturn1Y + forgivenInterestComponent;
+        const totalClientProfit2Y = clientReturn2Y + forgivenInterestComponent;
+        let numInstallments = 1;
+        let installmentLabel = "Opłata jednorazowa";
+        if (financingOption === '5_installments') {
+            numInstallments = 5;
+            installmentLabel = "Miesięczna rata (5 x 0%)";
+        } else if (financingOption === '10_installments') {
+            numInstallments = 10;
+            installmentLabel = "Miesięczna rata (10 x 0%)";
+        } else if (financingOption === '20_installments') {
+            numInstallments = 20;
+            installmentLabel = "Miesięczna rata (20 x 0%)";
+        }
+        const installmentAmount = totalFeeGross / numInstallments;
+        document.getElementById('resCourtNet').textContent = formatCurrency(feeCourt);
+        document.getElementById('resCourtGross').textContent = formatCurrency(feeCourt);
+        document.getElementById('resLawyerNet').textContent = formatCurrency(feeLawyerNet);
+        document.getElementById('resLawyerGross').textContent = formatCurrency(feeLawyerGross);
+        document.getElementById('resSurplusNet').textContent = formatCurrency(feeSurplusNet);
+        document.getElementById('resSurplusGross').textContent = formatCurrency(feeSurplusGross);
+        document.getElementById('resTotalNet').textContent = formatCurrency(totalFeeNet);
+        document.getElementById('resTotalGross').textContent = formatCurrency(totalFeeGross);
+        document.getElementById('resClientReturn1Y').textContent = formatCurrency(clientReturn1Y);
+        document.getElementById('resClientReturn2Y').textContent = formatCurrency(clientReturn2Y);
+        document.getElementById('resClientForgiven').textContent = formatCurrency(forgivenInterest);
+        document.getElementById('resClientTotal1Y').textContent = formatCurrency(totalClientProfit1Y);
+        document.getElementById('resClientTotal2Y').textContent = formatCurrency(totalClientProfit2Y);
+        document.getElementById('resOperatorFee').textContent = formatCurrency(operatorFee);
+        document.getElementById('resFirmStartProfit').textContent = formatCurrency(firmStartProfit);
+        document.getElementById('resFirmSF1Y').textContent = formatCurrency(firmSF1Y);
+        document.getElementById('resFirmSF2Y').textContent = formatCurrency(firmSF2Y);
+        document.getElementById('installment-label').textContent = installmentLabel;
+        document.getElementById('installment-amount').textContent = formatCurrency(installmentAmount);
+    }
+    
+    function clearForm() {
+        document.getElementById('wps').value = '';
+        document.getElementById('clientShare').value = '';
+        document.getElementById('feeSurplusNet').value = '';
+        document.getElementById('forgivenInterest').value = '';
+        document.querySelector('input[name="financing"][value="lump"]').checked = true;
+        calculate();
+    }
+
+    function saveAsPDF() {
+        const { jsPDF } = window.jspdf;
+        const captureArea = document.getElementById('capture-container');
+        const pdfButton = document.getElementById('save-pdf-btn');
+        
+        pdfButton.style.display = 'none';
+        
+        html2canvas(captureArea, {
+            backgroundColor: '#1f2937',
+            scale: 2 
+        }).then(canvas => {
+            pdfButton.style.display = 'block';
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save("kalkulacja-rentownosci.pdf");
+        });
+    }
+    
+    window.onload = calculate;
 </script>
 
 </body>
