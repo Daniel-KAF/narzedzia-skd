@@ -5,34 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Symulacje Kredytowe dla Klienta</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+Pro:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
 
         body {
-            font-family: 'Source Sans Pro', sans-serif;
-            background-color: #333;
-            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #d1d5db;
             margin: 0;
             padding: 20px;
         }
         .container {
             max-width: 1200px;
             margin: 20px auto;
-            background-color: #424242;
+            background-color: #1f2937;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
         }
         h2 {
             text-align: center;
-            color: #e0e0e0;
             margin-bottom: 30px;
-            font-family: 'Lora', serif;
-            font-weight: 600;
+            font-weight: 900;
+            font-size: 2.25rem;
+            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .controls-section {
             padding: 20px;
-            background-color: #3a3a3a;
+            background-color: #1f2937;
+            border: 1px solid #374151;
             border-radius: 10px;
             margin-bottom: 30px;
         }
@@ -49,14 +53,14 @@
             font-weight: 600;
             font-size: 14px;
             margin-bottom: 8px;
-            color: #ccc;
+            color: #9ca3af;
         }
         input[type="number"] {
             width: 100%;
             padding: 10px;
-            background-color: #525252;
-            color: #f0f0f0;
-            border: 1px solid #616161;
+            background-color: #374151;
+            color: #f9fafb;
+            border: 1px solid #4b5563;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
@@ -77,8 +81,8 @@
             gap: 10px;
         }
         .checkbox-group label {
-            background-color: #424242;
-            border: 1px solid #616161;
+            background-color: #374151;
+            border: 1px solid #4b5563;
             border-radius: 8px;
             padding: 10px;
             text-align: center;
@@ -95,8 +99,8 @@
 
         .action-button {
             background: none;
-            border: 1px dashed #616161;
-            color: #ccc;
+            border: 1px dashed #4b5563;
+            color: #9ca3af;
             width: 100%;
             padding: 8px;
             border-radius: 8px;
@@ -106,12 +110,12 @@
             margin-top: 5px;
         }
         .action-button:hover {
-            background-color: #525252;
+            background-color: #374151;
             color: #fff;
         }
         .remove-button {
             padding: 8px 12px;
-            background-color: #757575;
+            background-color: #4b5563;
             color: white;
             border: none;
             border-radius: 6px;
@@ -124,20 +128,21 @@
             font-size: 18px;
             font-weight: 600;
             color: #fff;
-            background-color: #009688;
+            background-image: linear-gradient(to right, #009688, #00796b);
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-image 0.2s;
             margin-top: 20px;
         }
-        .generate-button:hover { background-color: #00796b; }
+        .generate-button:hover { background-image: linear-gradient(to right, #00796b, #00695c); }
 
         .results-container {
             display: none;
             padding: 30px;
-            background-color: #3a3a3a;
+            background-color: #1f2937;
             border-radius: 10px;
+            border: 1px solid #374151;
         }
         
         .simulation-table-wrapper {
@@ -152,17 +157,16 @@
             padding: 15px;
             text-align: right;
             border: none;
-            border-bottom: 1px solid #525252;
+            border-bottom: 1px solid #374151;
         }
         th {
-            font-family: 'Lora', serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #e0e0e0;
             background-color: transparent;
             text-transform: uppercase;
             font-size: 13px;
             letter-spacing: 0.5px;
-            color: #aaa;
+            color: #9ca3af;
         }
         th:first-child, td:first-child {
             text-align: left;
@@ -176,10 +180,9 @@
             font-weight: 600;
             font-size: 18px;
             color: #81c784;
-            font-family: 'Source Code Pro', monospace;
         }
         tbody tr:hover {
-            background-color: #424242;
+            background-color: #374151;
         }
         
         .export-button {
@@ -188,17 +191,17 @@
             font-size: 16px;
             font-weight: 600;
             color: #fff;
-            background-color: #2196F3;
+            background-image: linear-gradient(to right, #2196F3, #1976D2);
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-image 0.2s;
             margin-top: 30px;
             display: block;
             margin-left: auto;
             margin-right: auto;
         }
-        .export-button:hover { background-color: #1976D2; }
+        .export-button:hover { background-image: linear-gradient(to right, #1976D2, #0d47a1); }
     </style>
 </head>
 <body>
@@ -234,7 +237,7 @@
     </div>
 
     <div class="results-container" id="resultsContainer">
-        <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
+        <h3 style="font-family: 'Inter', sans-serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
         <div class="simulation-table-wrapper">
             <table id="resultsTable">
                 <thead></thead>
@@ -246,6 +249,7 @@
 </div>
 
 <script>
+    // Cały skrypt JavaScript pozostaje bez zmian
     const formatCurrency = (value) => {
         if (!value || isNaN(value)) return "-";
         return value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
@@ -357,73 +361,26 @@
             alert("Brak danych do wygenerowania pliku. Najpierw wygeneruj symulację.");
             return;
         }
-
-        // --- ZAKTUALIZOWANA FUNKCJA GENEROWANIA PLIKU .DOC Z CIEMNYM MOTYWEM ---
         
         const styles = `
             <style>
-                /* Style dla głównego kontenera w Wordzie */
-                .word-document {
-                    background-color: #2b2b2b;
-                    font-family: Calibri, Arial, sans-serif;
-                    color: #e0e0e0;
-                    padding: 50pt; /* Marginesy */
-                }
-                h1 {
-                    font-size: 18pt;
-                    color: #009688; /* Kolor akcentu - Teal */
-                    text-align: center;
-                    margin-bottom: 12pt;
-                }
-                p.subtitle {
-                    font-size: 10pt;
-                    color: #bbbbbb;
-                    text-align: center;
-                    margin-bottom: 24pt;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    font-size: 10pt;
-                }
-                th, td {
-                    border: 1px solid #555555;
-                    padding: 8px;
-                    text-align: right;
-                }
-                th {
-                    background-color: #3a3a3a;
-                    color: #e0e0e0;
-                    font-weight: bold;
-                    text-align: center;
-                }
-                td.amount-header {
-                    text-align: left;
-                    font-weight: bold;
-                    background-color: #424242;
-                }
-                td.result-cell {
-                    color: #81c784; /* Zielony dla rat */
-                    font-weight: bold;
-                }
-                .footer {
-                    font-size: 8pt;
-                    color: #888888;
-                    text-align: center;
-                    margin-top: 40pt;
-                    border-top: 1px solid #555555;
-                    padding-top: 10pt;
-                }
+                .word-document { background-color: #111827; font-family: 'Inter', sans-serif; color: #d1d5db; padding: 50pt; }
+                h1 { font-size: 18pt; color: #60a5fa; text-align: center; margin-bottom: 12pt; }
+                p.subtitle { font-size: 10pt; color: #9ca3af; text-align: center; margin-bottom: 24pt; }
+                table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+                th, td { border: 1px solid #374151; padding: 8px; text-align: right; }
+                th { background-color: #1f2937; color: #9ca3af; font-weight: bold; text-align: center; text-transform: uppercase;}
+                td.amount-header { text-align: left; font-weight: bold; background-color: #374151; }
+                td.result-cell { color: #34d399; font-weight: bold; }
+                .footer { font-size: 8pt; color: #6b7280; text-align: center; margin-top: 40pt; border-top: 1px solid #374151; padding-top: 10pt; }
             </style>
         `;
 
         const oprocentowanie = document.getElementById('oprocentowanie').value;
         const prowizja = document.getElementById('prowizja').value;
         const currentDate = new Date().toLocaleDateString('pl-PL');
-        
-        // Klonujemy tabelę, aby zachować jej klasy dla stylów CSS
         const tableForWord = document.getElementById("resultsTable").cloneNode(true);
-        // Usuwamy style inline, aby arkusz stylów CSS miał pełną kontrolę
+        
         tableForWord.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
 
         let sourceHTML = `
