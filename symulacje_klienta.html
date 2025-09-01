@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Symulacje Kredytowe dla Klienta</title>
     <style>
+        /* Te style są używane w przeglądarce i zostaną wstrzyknięte do Worda */
         @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+Pro:wght@400;600;700&display=swap');
 
         body {
@@ -234,6 +235,24 @@
     </div>
 
     <div class="results-container" id="resultsContainer">
+        <div id="wordContentTemplate" style="display:none;">
+            <div style="font-family: 'Source Sans Pro', sans-serif; color: #333; margin: 0; padding: 20px;">
+                <h1 style="text-align: center; color: #000; margin-bottom: 20px; font-family: 'Lora', serif; font-weight: 600; font-size: 28px;">Symulacja Raty Miesięcznej</h1>
+                <p style="text-align: center; font-size: 14px; color: #555; margin-bottom: 30px;">
+                    Przygotowano dla oprocentowania <span id="wordOprocentowanie"></span>% i prowizji <span id="wordProwizja"></span>%
+                </p>
+                
+                <table id="wordResultsTable" style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 40px; border: 1px solid #ccc;">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+                
+                <p style="text-align: center; font-size: 10px; color: #777; margin-top: 50px;">
+                    Wygenerowano w Krakowie, <span id="wordDate"></span> | Dokument ma charakter informacyjny.
+                </p>
+            </div>
+        </div>
+
         <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
         <div class="simulation-table-wrapper">
             <table id="resultsTable">
@@ -292,7 +311,6 @@
     }
 
     function generujSymulacje() {
-        // Ta funkcja pozostaje bez zmian
         const rocznaStopa = parseFloat(document.getElementById('oprocentowanie').value) || 0;
         const prowizjaProc = parseFloat(document.getElementById('prowizja').value) || 0;
         const resultsContainer = document.getElementById('resultsContainer');
@@ -353,40 +371,101 @@
         resultsContainer.style.display = 'block';
     }
     
-    // --- NOWA FUNKCJA DO GENEROWANIA PLIKU WORD (.doc) ---
     function generateWordDoc() {
         if (document.querySelector("#resultsTable tbody").rows.length === 0) {
             alert("Brak danych do wygenerowania pliku. Najpierw wygeneruj symulację.");
             return;
         }
-        
-        // Tworzenie kodu HTML, który zostanie umieszczony w pliku
-        // Dodajemy podstawowe style, aby tabela dobrze wyglądała w Wordzie
-        let header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-            "xmlns='http://www.w3.org/TR/REC-html40'>"+
-            "<head><meta charset='utf-8'><title>Symulacja Kredytowa</title></head><body>";
-        
-        let footer = "</body></html>";
-        
+
+        // Pobieramy aktualne dane z formularza
         const oprocentowanie = document.getElementById('oprocentowanie').value;
         const prowizja = document.getElementById('prowizja').value;
-        const tableHTML = document.getElementById("resultsTable").outerHTML;
+        const currentDate = new Date().toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-        // Budowanie całej zawartości pliku
-        let sourceHTML = header +
-            `<h1>Symulacja Raty Miesięcznej</h1>` +
-            `<p>Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>` +
-            tableHTML +
-            `<br><p><i>Dokument ma charakter informacyjny.</i></p>` +
-            footer;
+        // --- Klonowanie i przygotowanie ukrytego szablonu do Worda ---
+        const wordContentDiv = document.getElementById('wordContentTemplate').cloneNode(true);
+        wordContentDiv.style.display = 'block'; // Ujawnij do skopiowania, potem ukryj
 
-        // Tworzenie pliku do pobrania
+        // Wypełniamy nagłówki i stopki w szablonie
+        wordContentDiv.querySelector('#wordOprocentowanie').textContent = oprocentowanie;
+        wordContentDiv.querySelector('#wordProwizja').textContent = prowizja;
+        wordContentDiv.querySelector('#wordDate').textContent = currentDate;
+
+        // Kopiowanie danych z widocznej tabeli do tabeli w szablonie Worda
+        const originalTable = document.getElementById("resultsTable");
+        const wordTableHead = wordContentDiv.querySelector("#wordResultsTable thead");
+        const wordTableBody = wordContentDiv.querySelector("#wordResultsTable tbody");
+
+        // Kopiowanie nagłówków tabeli
+        wordTableHead.innerHTML = originalTable.querySelector("thead").innerHTML;
+        // Zastosowanie stylów do nagłówków w Wordzie
+        wordTableHead.querySelectorAll('th').forEach(th => {
+            th.style.backgroundColor = '#4CAF50'; // Zielony nagłówek
+            th.style.color = '#FFFFFF';
+            th.style.padding = '10px';
+            th.style.textAlign = 'center';
+            th.style.border = '1px solid #ddd';
+        });
+
+        // Kopiowanie wierszy z danymi
+        originalTable.querySelectorAll("tbody tr").forEach((row, rowIndex) => {
+            const newRow = wordTableBody.insertRow();
+            row.querySelectorAll("td").forEach((cell, cellIndex) => {
+                const newCell = newRow.insertCell();
+                newCell.textContent = cell.textContent;
+                newCell.style.padding = '8px';
+                newCell.style.border = '1px solid #ddd';
+                if (cellIndex === 0) { // Pierwsza kolumna (Kwota Kredytu)
+                    newCell.style.textAlign = 'left';
+                    newCell.style.fontWeight = 'bold';
+                    newCell.style.backgroundColor = '#f2f2f2'; // Lekkie tło dla kwoty
+                } else { // Kolumny z ratami
+                    newCell.style.textAlign = 'right';
+                    newCell.style.fontWeight = 'bold'; // Raty pogrubione
+                }
+            });
+        });
+
+        // Pobranie stylów CSS z bieżącego dokumentu
+        const currentStyles = Array.from(document.querySelectorAll('style'))
+                                   .map(style => style.innerHTML)
+                                   .join('\n');
+
+        // Tworzenie kodu HTML, który zostanie umieszczony w pliku .doc
+        let header = `<html xmlns:o='urn:schemas-microsoft-com:office:office'
+                      xmlns:w='urn:schemas-microsoft-com:office:word'
+                      xmlns='http://www.w3.org/TR/REC-html40'>
+                      <head>
+                          <meta charset='utf-8'>
+                          <title>Symulacja Kredytowa</title>
+                          <style type="text/css">
+                              /* Resetowanie niektórych domyślnych stylów Worda */
+                              body { font-family: 'Source Sans Pro', sans-serif; margin: 1in; }
+                              h1, h2, h3, h4, h5, h6 { font-family: 'Lora', serif; margin-top: 12pt; margin-bottom: 3pt; }
+                              p { margin-bottom: 6pt; }
+                              table { border-collapse: collapse; width: 100%; }
+                              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                              th { background-color: #4CAF50; color: white; }
+                              .simulation-table-wrapper { width: 100%; overflow: visible; } /* Ważne dla Worda */
+
+                              /* Możesz dodać dodatkowe style specyficzne dla Worda tutaj */
+                              @page WordSection1 { size: 8.5in 11.0in; margin: 1in 1in 1in 1in; }
+                              div.WordSection1 { page: WordSection1; }
+                          </style>
+                      </head>
+                      <body><div class="WordSection1">`;
+        
+        let footer = "</div></body></html>";
+        
+        // Zbudowanie pełnego HTML dla Worda
+        let sourceHTML = header + wordContentDiv.innerHTML + footer;
+
+        // Tworzenie i pobieranie pliku
         let source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
         let fileDownload = document.createElement("a");
         document.body.appendChild(fileDownload);
         fileDownload.href = source;
-        fileDownload.download = 'symulacja_kredytowa.doc';
+        fileDownload.download = `oferta_kredytowa_${currentDate}.doc`;
         fileDownload.click();
         document.body.removeChild(fileDownload);
     }
