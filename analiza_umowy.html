@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Analizy Umowy Kredytowej - Sankcja Kredytu Darmowego (SKD)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .prose { max-width: 100%; }
+        .prose h3 { margin-top: 1.5em; margin-bottom: 0.5em; font-size: 1.25rem; font-weight: 600; color: #f9fafb;}
+        .prose p, .prose li { color: #d1d5db; }
+        .prose strong { color: #f9fafb; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
+    <div id="generator-view" class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Inteligentny Generator Analizy SKD</h1>
+            <p class="text-gray-400 mt-2">Wpisz numer artykułu z Ustawy, a narzędzie automatycznie przygotuje analizę.</p>
+        </header>
+
+        <main class="space-y-6">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Krok 1: Wprowadź dane sprawy</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="clientName" class="block text-sm font-medium text-gray-300 mb-1">Klient</label>
+                        <input type="text" id="clientName" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Jan Kowalski">
+                    </div>
+                    <div>
+                        <label for="lenderName" class="block text-sm font-medium text-gray-300 mb-1">Bank / Kredytodawca</label>
+                        <input type="text" id="lenderName" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Nazwa banku">
+                    </div>
+                    <div>
+                        <label for="agreementNumber" class="block text-sm font-medium text-gray-300 mb-1">Numer umowy</label>
+                        <input type="text" id="agreementNumber" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="123/456/789">
+                    </div>
+                    <div>
+                        <label for="agreementDate" class="block text-sm font-medium text-gray-300 mb-1">Data zawarcia umowy</label>
+                        <input type="date" id="agreementDate" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" style="color-scheme: dark;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Krok 2: Wprowadź naruszone artykuły Ustawy</h2>
+                <div id="violations-container" class="space-y-4">
+                    </div>
+                <div class="mt-4">
+                    <button id="add-violation-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Dodaj kolejne naruszenie
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                 <button id="generate-btn" class="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                    Generuj Link do Oferty
+                </button>
+            </div>
+
+            <div id="link-container" class="bg-gray-800 p-6 rounded-lg shadow-lg hidden mt-6">
+                 <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Krok 3: Gotowy link do wysłania</h2>
+                 <p class="text-gray-400 mb-4">Skopiuj poniższy link i wyślij go do klienta. Po otwarciu zobaczy interaktywną ofertę.</p>
+                 <div class="flex space-x-2">
+                    <input id="generated-link" type="text" readonly class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-300">
+                    <button id="copy-link-btn" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-md">Kopiuj</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="report-view" class="hidden">
+        </div>
+
+    <script>
+        const flawsData = [
+            { id: 'maxCostsExceeded', identifiers: ['36a'], label: 'Przekroczenie maksymalnych pozaodsetkowych kosztów kredytu', title: 'Naruszenie w zakresie maksymalnych pozaodsetkowych kosztów kredytu', legalBasis: 'Art. 36a ustawy o kredycie konsumenckim.', explanation: 'Zidentyfikowano, że suma kosztów pozaodsetkowych (takich jak prowizja, opłaty administracyjne, koszty ubezpieczeń) nałożonych na Kredytobiorcę przekracza ustawowy limit. Celem tego przepisu jest ochrona konsumenta przed lichwą i ukrywaniem realnego kosztu kredytu. Obciążenie kredytobiorcy kosztami przewyższającymi ustawowy limit jest rażącym naruszeniem prawa i stanowi jedną z najczęstszych podstaw do zastosowania sankcji kredytu darmowego.' },
+            { id: 'incorrectTotalAmount', identifiers: ['5.7', '30.1.2'], label: 'Nieprawidłowe zdefiniowanie całkowitej kwoty kredytu (kredytowanie kosztów)', title: 'Nieprawidłowe określenie całkowitej kwoty kredytu', legalBasis: 'Art. 5 pkt 7 oraz art. 30 ust. 1 pkt 2 ustawy o kredycie konsumenckim.', explanation: 'W umowie do "całkowitej kwoty kredytu" wliczono koszty takie jak prowizja czy składka ubezpieczeniowa, które zostały potrącone przez bank z góry i nigdy nie zostały fizycznie udostępnione Kredytobiorcy. Taka praktyka sztucznie zawyża kwotę kredytu, co wprowadza konsumenta w błąd, prowadzi do nieprawidłowego naliczenia odsetek (które są liczone od wyższej podstawy) oraz do błędnego wyliczenia wskaźnika RRSO.' },
+            { id: 'noProportionalRefund', identifiers: ['49'], label: 'Brak proporcjonalnego zwrotu kosztów przy wcześniejszej spłacie', title: 'Naruszenie zasad rozliczenia kredytu w przypadku wcześniejszej spłaty', legalBasis: 'Art. 49 ustawy o kredycie konsumenckim oraz wyrok Trybunału Sprawiedliwości UE w sprawie C-383/18 (Lex-Kam).', explanation: 'Umowa nie gwarantuje proporcjonalnego obniżenia i zwrotu wszystkich kosztów kredytu (w tym prowizji i opłat jednorazowych) w przypadku jego spłaty przed terminem. Zgodnie z prawem, jeśli konsument spłaca kredyt wcześniej, całkowity koszt kredytu musi ulec obniżeniu o te koszty, które dotyczą okresu, o który skrócono czas obowiązywania umowy. Zapisy umowne, które to wyłączają lub ograniczają, są niezgodne z prawem.' },
+            { id: 'incorrectAprc', identifiers: ['30.1.7'], label: 'Błędnie obliczona Rzeczywista Roczna Stopa Oprocentowania (RRSO)', title: 'Wadliwe określenie Rzeczywistej Rocznej Stopy Oprocentowania (RRSO)', legalBasis: 'Art. 30 ust. 1 pkt 7 oraz załącznik nr 4 do ustawy o kredycie konsumenckim.', explanation: 'Wskaźnik RRSO podany w umowie został obliczony nieprawidłowo, najczęściej poprzez nieuwzględnienie w kalkulacji wszystkich wymaganych kosztów kredytu. RRSO to kluczowy wskaźnik, który ma umożliwić konsumentowi realne porównanie ofert. Jego błędne, zaniżone wyliczenie stanowi poważne naruszenie obowiązków informacyjnych, ponieważ wprowadza konsumenta w błąd co do faktycznej ceny kredytu.' },
+            { id: 'missingInfoForm', identifiers: ['13', '14', '29'], label: 'Brak lub wadliwy formularz informacyjny przed zawarciem umowy', title: 'Naruszenie obowiązku informacyjnego przed zawarciem umowy', legalBasis: 'Art. 13, 14 i 29 ustawy o kredycie konsumenckim.', explanation: 'Kredytodawca ma obowiązek przekazać konsumentowi, przed zawarciem umowy, formularz informacyjny na trwałym nośniku, zawierający wszystkie kluczowe dane dotyczące kredytu. Brak tego dokumentu, jego niekompletność lub przekazanie go w nietrwałej formie uniemożliwia konsumentowi podjęcie świadomej decyzji i stanowi podstawę do skorzystania z sankcji kredytu darmowego.' },
+            { id: 'withdrawalIssues', identifiers: ['30.1.16', '53'], label: 'Brak lub niepełne informacje o prawie do odstąpienia od umowy', title: 'Nieprawidłowe informacje dotyczące prawa do odstąpienia od umowy', legalBasis: 'Art. 30 ust. 1 pkt 16 oraz art. 53 ustawy o kredycie konsumenckim.', explanation: 'Umowa musi zawierać precyzyjne i kompletne informacje o procedurze, terminie oraz skutkach odstąpienia od umowy, w tym wzór oświadczenia o odstąpieniu. Wszelkie braki lub nieścisłości w tym zakresie naruszają prawa konsumenta i mogą stanowić przesłankę do zastosowania sankcji.' },
+            { id: 'missingElements', identifiers: ['30', '30.1'], label: 'Brak innych obligatoryjnych elementów umowy', title: 'Brak w umowie wszystkich wymaganych elementów', legalBasis: 'Art. 30 ust. 1 ustawy o kredycie konsumenckim.', explanation: 'Ustawa o kredycie konsumenckim wymienia szereg obowiązkowych elementów, które muszą znaleźć się w każdej umowie (np. dane stron, rodzaj kredytu, czas obowiązywania, stopa oprocentowania). Brak któregokolwiek z tych elementów stanowi naruszenie, które kwalifikuje umowę do sankcji kredytu darmowego, ponieważ umowa jest niekompletna i nie spełnia wymogów prawnych.' },
+        ];
+
+        const buildReportHtml = (reportData) => {
+            let { clientName, lenderName, agreementNumber, agreementDate, violations } = reportData;
+            agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
+
+            let reportHTML = `
+                <div class="max-w-4xl mx-auto bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg prose">
+                    <h3 style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 2rem; color: white;">WSTĘPNA ANALIZA PRAWNA UMOWY KREDYTOWEJ NR ${agreementNumber}</h3>
+                    <p><strong>Data sporządzenia:</strong> ${new Date().toLocaleDateString('pl-PL')}</p>
+                    <p><strong>Dotyczy:</strong> Umowy o kredyt konsumencki z dnia ${agreementDate} zawartej pomiędzy ${clientName} a ${lenderName}.</p>
+                    <br>
+                    <p>Szanowni Państwo,</p>
+                    <p>w odpowiedzi na Państwa prośbę o analizę umowy kredytowej nr ${agreementNumber}, poniżej przedstawiamy zestawienie zidentyfikowanych uchybień, które mogą stanowić podstawę do skorzystania z <strong>sankcji kredytu darmowego</strong> na mocy art. 45 ustawy o kredycie konsumenckim z dnia 12 maja 2011 r.</p>
+                    <p>Sankcja ta oznacza, że w przypadku stwierdzenia przez sąd naruszeń określonych w ustawie, Kredytobiorca ma prawo spłacać kredyt <strong>bez odsetek i innych kosztów kredytu</strong>, zwracając jedynie pożyczony kapitał.</p>
+                    <br>
+                    <h3 style="font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; color: white;">ZIDENTYFIKOWANE NARUSZENIA W UMOWIE:</h3>`;
+            
+            violations.forEach((flaw, index) => {
+                reportHTML += `
+                    <h3>${index + 1}. ${flaw.title}</h3>
+                    <ul>
+                        <li><strong>Zarzut:</strong> ${flaw.label}.</li>
+                        <li><strong>Naruszone przepisy Ustawy:</strong> ${flaw.article}</li>
+                        <li><strong>Podstawa prawna do sankcji:</strong> ${flaw.legalBasis}</li>
+                        <li><strong>Wyjaśnienie abuzywności:</strong> ${flaw.explanation}</li>
+                    </ul>`;
+            });
+
+            reportHTML += `
+                <br>
+                <p>Powyższe naruszenia w sposób istotny naruszają prawa konsumenta i dają solidne podstawy do podjęcia działań prawnych w celu zastosowania sankcji kredytu darmowego. Rekomendujemy dalsze kroki w tej sprawie.</p>
+                <p>Z poważaniem,<br>[Twoje Imię i Nazwisko/Nazwa Firmy]</p>
+                </div>`;
+            return reportHTML;
+        };
+
+        const renderReportFromURL = () => {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#data=')) {
+                try {
+                    const base64Data = hash.substring(6);
+                    const jsonData = atob(decodeURIComponent(base64Data));
+                    const reportData = JSON.parse(jsonData);
+
+                    document.getElementById('generator-view').style.display = 'none';
+                    const reportView = document.getElementById('report-view');
+                    reportView.innerHTML = buildReportHtml(reportData);
+                    reportView.style.display = 'block';
+                } catch (e) {
+                    console.error("Błąd podczas dekodowania danych z URL:", e);
+                    // Opcjonalnie: Pokaż błąd użytkownikowi
+                }
+            }
+        };
+
+        // --- Inicjalizacja widoku generatora ---
+        const initGenerator = () => {
+            const violationsContainer = document.getElementById('violations-container');
+            const addViolationBtn = document.getElementById('add-violation-btn');
+            let violationCounter = 0;
+
+            const normalizeArticle = (input) => input.toLowerCase().replace(/§|art\.?|ust\.?|pkt\.?/g, '').replace(/ /g, '').replace(/,/g, '.');
+            const findFlawByIdentifier = (id) => {
+                const nId = normalizeArticle(id);
+                return nId ? flawsData.find(f => f.identifiers && f.identifiers.some(i => nId.startsWith(i))) : null;
+            };
+
+            const addViolationRow = () => {
+                violationCounter++;
+                const id = `v-${violationCounter}`;
+                const div = document.createElement('div');
+                div.className = 'bg-gray-700 p-4 rounded-md violation-row';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-gray-300">Naruszenie #${violationCounter}</label>
+                        <button class="remove-violation-btn text-gray-400 hover:text-red-500 p-1"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Artykuł / Ustęp / Punkt</label>
+                            <div class="flex space-x-2">
+                                <input type="text" data-part="article" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Art./§">
+                                <input type="text" data-part="ustep" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Ust.">
+                                <input type="text" data-part="punkt" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Pkt.">
+                            </div>
+                            <input type="hidden" data-part="flaw-id">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Rozpoznane naruszenie</label>
+                            <div data-part="detected" class="w-full bg-gray-800 rounded-md p-1.5 text-sm min-h-[34px] text-gray-400">Wprowadź numer...</div>
+                        </div>
+                    </div>`;
+                violationsContainer.appendChild(div);
+                div.querySelector('.remove-violation-btn').addEventListener('click', () => div.remove());
+
+                const inputs = div.querySelectorAll('input[data-part]');
+                const handleInput = () => {
+                    const combinedId = `${inputs[0].value}.${inputs[1].value}.${inputs[2].value}`;
+                    const flaw = findFlawByIdentifier(combinedId);
+                    const detectedDiv = div.querySelector('[data-part="detected"]');
+                    const hiddenInput = div.querySelector('[data-part="flaw-id"]');
+                    if (flaw) {
+                        detectedDiv.textContent = flaw.label;
+                        detectedDiv.className = 'w-full bg-gray-800 rounded-md p-1.5 text-sm min-h-[34px] text-green-400';
+                        hiddenInput.value = flaw.id;
+                    } else {
+                        detectedDiv.textContent = 'Nie rozpoznano';
+                        detectedDiv.className = 'w-full bg-gray-800 rounded-md p-1.5 text-sm min-h-[34px] text-red-400';
+                        hiddenInput.value = '';
+                    }
+                };
+                inputs.forEach(input => input.addEventListener('input', handleInput));
+            };
+
+            addViolationBtn.addEventListener('click', addViolationRow);
+            addViolationRow();
+            
+            document.getElementById('generate-btn').addEventListener('click', () => {
+                const reportData = {
+                    clientName: document.getElementById('clientName').value || '[Imię i nazwisko Klienta]',
+                    lenderName: document.getElementById('lenderName').value || '[Nazwa banku]',
+                    agreementNumber: document.getElementById('agreementNumber').value || '[Numer umowy]',
+                    agreementDate: document.getElementById('agreementDate').value,
+                    violations: []
+                };
+                
+                document.querySelectorAll('.violation-row').forEach(row => {
+                    const flawId = row.querySelector('[data-part="flaw-id"]').value;
+                    if (flawId) {
+                        const articlePart = row.querySelector('[data-part="article"]').value.trim();
+                        const ustepPart = row.querySelector('[data-part="ustep"]').value.trim();
+                        const punktPart = row.querySelector('[data-part="punkt"]').value.trim();
+                        
+                        let fullArticle = /art|§/i.test(articlePart) ? articlePart : `art. ${articlePart}`;
+                        if (ustepPart) fullArticle += ` ust. ${ustepPart}`;
+                        if (punktPart) fullArticle += ` pkt. ${punktPart}`;
+
+                        const flawData = flawsData.find(f => f.id === flawId);
+                        reportData.violations.push({ ...flawData, article: fullArticle });
+                    }
+                });
+
+                if (reportData.violations.length === 0) {
+                      const btn = document.getElementById('generate-btn');
+                      const originalText = btn.innerText;
+                      btn.innerText = 'Wprowadź poprawne artykuły!';
+                      btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                      btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                      setTimeout(() => {
+                          btn.innerText = originalText;
+                          btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                          btn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                      }, 2000);
+                      return;
+                }
+                
+                const jsonData = JSON.stringify(reportData);
+                const base64Data = btoa(jsonData);
+                const url = `${window.location.href.split('#')[0]}#data=${encodeURIComponent(base64Data)}`;
+                
+                document.getElementById('generated-link').value = url;
+                document.getElementById('link-container').classList.remove('hidden');
+                document.getElementById('link-container').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            document.getElementById('copy-link-btn').addEventListener('click', () => {
+                const linkInput = document.getElementById('generated-link');
+                linkInput.select();
+                document.execCommand('copy');
+                const btn = document.getElementById('copy-link-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Skopiowano!';
+                setTimeout(() => { btn.innerText = originalText; }, 1500);
+            });
+        };
+
+        // Główna logika - sprawdź, w jakim trybie uruchomić stronę
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash.startsWith('#data=')) {
+                renderReportFromURL();
+            } else {
+                initGenerator();
+            }
+        });
+    </script>
+</body>
+</html>
