@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symulacja Kredytowa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #d1d5db;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .header { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        .logo { height: 80px; border-radius: 8px; }
+        h1 { text-align: center; font-size: 1.875rem; font-weight: 700; margin: 0 0 5px 0; color: #f9fafb; }
+        p.subtitle { text-align: center; color: #9ca3af; margin-top: 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 16px;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #374151;
+        }
+        th {
+            text-transform: uppercase;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        th:first-child, td:first-child { text-align: left; }
+        td.amount-header { font-weight: bold; font-size: 18px; color: #f0f0f0; }
+        td.result-cell { font-weight: 600; font-size: 18px; color: #81c784; }
+    </style>
+</head>
+<body>
+    <div id="report-container">
+        </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const reportContainer = document.getElementById('report-container');
+        const params = new URLSearchParams(window.location.search);
+        const jsonData = params.get('data');
+
+        if (!jsonData) {
+            reportContainer.innerHTML = `<p>Brak danych do wyświetlenia.</p>`;
+            return;
+        }
+
+        try {
+            const reportData = JSON.parse(jsonData);
+            let tableHTML = `<table class="results-table"><thead><tr>`;
+            reportData.headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += `</tr></thead><tbody>`;
+            reportData.data.forEach(row => {
+                tableHTML += `<tr>`;
+                row.forEach((cell, index) => {
+                    if (index === 0) {
+                        tableHTML += `<td class="amount-header">${cell}</td>`;
+                    } else {
+                        tableHTML += `<td class="result-cell">${cell}</td>`;
+                    }
+                });
+                tableHTML += `</tr>`;
+            });
+            tableHTML += `</tbody></table>`;
+
+            reportContainer.innerHTML = `
+                <header class="header">
+                    <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
+                </header>
+                <h1>Symulacja Raty Miesięcznej</h1>
+                <p class="subtitle">Przygotowano dla oprocentowania ${reportData.oproc}% i prowizji ${reportData.prow}%</p>
+                <div class="container">
+                    ${tableHTML}
+                </div>
+            `;
+        } catch(e) {
+            reportContainer.innerHTML = `<p>Wystąpił błąd podczas odczytywania danych.</p>`;
+            console.error(e);
+        }
+    });
+</script>
+</body>
+</html>
