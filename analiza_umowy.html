@@ -55,7 +55,7 @@
             
             <div class="text-center">
                  <button id="generate-btn" class="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                    Generuj Link do Analizy
+                    Generuj Link i Otwórz Analizę
                 </button>
             </div>
 
@@ -183,13 +183,15 @@
                 const params = new URLSearchParams();
                 params.set('data', JSON.stringify(reportData));
                 
-                // --- KLUCZOWA POPRAWKA: Budowanie pełnego adresu URL ---
                 const baseURL = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1) + 'raport.html';
                 const finalUrl = `${baseURL}?${params.toString()}`;
                 
                 document.getElementById('generated-link').value = finalUrl;
                 document.getElementById('link-container').classList.remove('hidden');
                 document.getElementById('link-container').scrollIntoView({ behavior: 'smooth' });
+
+                // --- NOWA LINIA: Automatyczne otwarcie linku w nowej karcie ---
+                window.open(finalUrl, '_blank');
             });
 
             document.getElementById('copy-link-btn').addEventListener('click', () => {
