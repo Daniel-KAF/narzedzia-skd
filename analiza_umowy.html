@@ -89,7 +89,10 @@
         });
 
         generateBtn.addEventListener('click', () => {
-            const baseURL = 'raport.html';
+            // --- KLUCZOWA POPRAWKA ---
+            // Podajemy pełny adres URL do pliku raport.html
+            const baseURL = 'https://daniel-kaf.github.io/narzedzia-skd/raport.html';
+            
             const params = new URLSearchParams();
 
             params.set('clientName', document.getElementById('clientName').value);
