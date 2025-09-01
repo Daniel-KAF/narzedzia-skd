@@ -13,6 +13,27 @@
         .prose p, .prose li { color: #d1d5db; }
         .prose strong { color: #f9fafb; }
         .prose ul { list-style-type: disc; padding-left: 1.5rem; }
+        /* Style dla wykresu */
+        .chart-container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            background-color: #374151;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .chart-bar {
+            height: 30px;
+            background: linear-gradient(to right, #34d399, #60a5fa);
+            border-radius: 0.25rem;
+            color: #111827;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-size: 1rem;
+            transition: width 1s ease-out;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
@@ -25,21 +46,24 @@
             const reportView = document.getElementById('report-view');
             
             const buildReportHtml = (reportData) => {
-                // Odczytanie nowych danych
-                let { clientName, lenderName, agreementNumber, agreementDate, violations, analysisDate, advisorName } = reportData;
-                
+                let { clientName, lenderName, agreementNumber, agreementDate, violations } = reportData;
                 agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
-                // Formatowanie daty analizy lub użycie dzisiejszej, jeśli nie podano
-                analysisDate = analysisDate ? new Date(analysisDate).toLocaleDateString('pl-PL') : new Date().toLocaleDateString('pl-PL');
-                
-                // Ustawienie domyślnej wartości dla doradcy, jeśli pole jest puste
-                advisorName = advisorName || '[Imię i nazwisko doradcy]';
+
+                // Wykres - obliczenie szerokości na podstawie liczby naruszeń (max 100%)
+                const chartWidth = Math.min(violations.length * 20, 100);
 
                 let reportHTML = `
                     <h3 style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 2rem; color: white;">WSTĘPNA ANALIZA PRAWNA UMOWY KREDYTOWEJ NR ${agreementNumber}</h3>
-                    <p><strong>Data sporządzenia:</strong> ${analysisDate}</p>
+                    <p><strong>Data sporządzenia:</strong> ${new Date().toLocaleDateString('pl-PL')}</p>
                     <p><strong>Dotyczy:</strong> Umowy o kredyt konsumencki z dnia ${agreementDate} zawartej pomiędzy ${clientName} a ${lenderName}.</p>
-                    <br>
+                    
+                    <div class="chart-container">
+                        <p style="margin-bottom: 0.5rem; font-size: 0.875rem; color: #9ca3af;">Liczba zidentyfikowanych naruszeń:</p>
+                        <div class="chart-bar" style="width: ${chartWidth}%;">
+                            ${violations.length}
+                        </div>
+                    </div>
+
                     <p>Szanowni Państwo,</p>
                     <p>w odpowiedzi na Państwa prośbę, poniżej przedstawiamy zestawienie zidentyfikowanych uchybień, które mogą stanowić podstawę do skorzystania z <strong>sankcji kredytu darmowego</strong> na mocy art. 45 ustawy o kredycie konsumenckim.</p>
                     <br>
@@ -60,11 +84,10 @@
                     reportHTML += `<p>Nie wprowadzono żadnych naruszeń.</p>`;
                 }
 
-                // Nowy, dynamiczny podpis
                 reportHTML += `
                     <br>
                     <p>Powyższe naruszenia dają podstawy do podjęcia działań prawnych. Rekomendujemy dalsze kroki w tej sprawie.</p>
-                    <p>Z poważaniem,<br>${advisorName}<br>Kancelaria Analizy Finansowej</p>`;
+                    <p>Z poważaniem,<br>[Twoja Nazwa Firmy]</p>`;
 
                 return reportHTML;
             };
