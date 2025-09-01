@@ -4,113 +4,385 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Symulacje Kredytowe dla Klienta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+Pro:wght@400;600;700&display=swap');
-        /* Wszystkie style pozostają takie same jak poprzednio */
-        body { font-family: 'Source Sans Pro', sans-serif; background-color: #333; color: #f0f0f0; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 20px auto; background-color: #424242; padding: 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5); }
-        h2 { text-align: center; color: #e0e0e0; margin-bottom: 30px; font-family: 'Lora', serif; font-weight: 600; }
-        .controls-section { padding: 20px; background-color: #3a3a3a; border-radius: 10px; margin-bottom: 30px; }
-        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .input-group { position: relative; }
-        .input-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #ccc; }
-        input[type="number"] { width: 100%; padding: 10px; background-color: #525252; color: #f0f0f0; border: 1px solid #616161; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .amount-input-container { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .amount-input-container input { flex-grow: 1; }
-        .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; }
-        .checkbox-group label { background-color: #424242; border: 1px solid #616161; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; font-weight: 600; }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #333;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #424242;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            text-align: center;
+            color: #e0e0e0;
+            margin-bottom: 30px;
+            font-family: 'Lora', serif;
+            font-weight: 600;
+        }
+        
+        .controls-section {
+            padding: 20px;
+            background-color: #3a3a3a;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #525252;
+            color: #f0f0f0;
+            border: 1px solid #616161;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .amount-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .amount-input-container input {
+            flex-grow: 1;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        .checkbox-group label {
+            background-color: #424242;
+            border: 1px solid #616161;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-weight: 600;
+        }
         .checkbox-group input { display: none; }
-        .checkbox-group input:checked + label { background-color: #009688; color: #fff; border-color: #009688; }
-        .action-button { background: none; border: 1px dashed #616161; color: #ccc; width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; margin-top: 5px; }
-        .action-button:hover { background-color: #525252; color: #fff; }
-        .remove-button { padding: 8px 12px; background-color: #757575; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        .generate-button { width: 100%; padding: 15px; font-size: 18px; font-weight: 600; color: #fff; background-color: #009688; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; margin-top: 20px; }
+        .checkbox-group input:checked + label {
+            background-color: #009688;
+            color: #fff;
+            border-color: #009688;
+        }
+
+        .action-button {
+            background: none;
+            border: 1px dashed #616161;
+            color: #ccc;
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-top: 5px;
+        }
+        .action-button:hover {
+            background-color: #525252;
+            color: #fff;
+        }
+        .remove-button {
+            padding: 8px 12px;
+            background-color: #757575;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .generate-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #009688;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
         .generate-button:hover { background-color: #00796b; }
-        .results-container { display: none; padding: 30px; background-color: #3a3a3a; border-radius: 10px; }
-        .simulation-table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 16px; }
-        th, td { padding: 15px; text-align: right; border: none; border-bottom: 1px solid #525252; }
-        th { font-family: 'Lora', serif; font-weight: 600; color: #e0e0e0; background-color: transparent; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; color: #aaa; }
-        th:first-child, td:first-child { text-align: left; }
-        td.amount-header { font-weight: bold; font-size: 18px; color: #f0f0f0; }
-        td.result-cell { font-weight: 600; font-size: 18px; color: #81c784; font-family: 'Source Code Pro', monospace; }
-        tbody tr:hover { background-color: #424242; }
-        .export-button { width: auto; padding: 12px 25px; font-size: 16px; font-weight: 600; color: #fff; background-color: #2196F3; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; margin-top: 30px; display: block; margin-left: auto; margin-right: auto; }
-        .export-button:hover { background-color: #1976D2; }
+
+        .results-container {
+            display: none;
+            padding: 30px;
+            background-color: #3a3a3a;
+            border-radius: 10px;
+        }
+        
+        /* === ZAKTUALIZOWANE STYLE TABELI === */
+        .simulation-table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Łączymy ramki */
+            font-size: 16px;
+        }
+        th, td {
+            padding: 15px; /* Więcej przestrzeni */
+            text-align: right; /* Domyślnie wyrównanie do prawej dla liczb */
+            border: none; /* Usuwamy pionowe ramki */
+            border-bottom: 1px solid #525252; /* Tylko poziome linie */
+        }
+        th {
+            font-family: 'Lora', serif;
+            font-weight: 600;
+            color: #e0e0e0;
+            background-color: transparent; /* Usunięte tło */
+            text-transform: uppercase; /* Wielkie litery */
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            color: #aaa;
+        }
+        th:first-child, td:first-child {
+            text-align: left; /* Pierwsza kolumna do lewej */
+        }
+        td.amount-header {
+            font-weight: bold;
+            font-size: 18px;
+            color: #f0f0f0;
+        }
+        td.result-cell {
+            font-weight: 600;
+            font-size: 18px;
+            color: #81c784;
+            font-family: 'Source Code Pro', monospace; /* Czcionka o stałej szerokości dla liczb */
+        }
+        tbody tr:hover {
+            background-color: #424242; /* Efekt podświetlenia wiersza */
+        }
+        
+        .pdf-button {
+            width: auto;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #f57c00;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .pdf-button:hover { background-color: #e65100; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Generator Symulacji Kredytowych</h2>
-    <div class="controls-section"></div>
-    <div class="results-container" id="resultsContainer">
-        <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
-        <div class="simulation-table-wrapper">
-            <table id="resultsTable">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
+
+    <div class="controls-section">
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Kwoty do symulacji (zł)</label>
+                <div id="amountInputsContainer">
+                    <div class="amount-input-container">
+                        <input type="number" class="kwota-input" placeholder="np. 100000">
+                    </div>
+                </div>
+                <button class="action-button" onclick="addAmountInput()">+ Dodaj kolejną kwotę</button>
+            </div>
+            <div class="input-group">
+                 <label>Okresy kredytowania (w latach)</label>
+                 <div class="checkbox-group" id="yearsCheckboxes"></div>
+            </div>
+            <div class="input-group">
+                <label for="oprocentowanie">Oprocentowanie (%)</label>
+                <input type="number" id="oprocentowanie" value="8.99" step="0.01">
+            </div>
+            <div class="input-group">
+                <label for="prowizja">Prowizja (%)</label>
+                <input type="number" id="prowizja" value="2.39" step="0.01">
+            </div>
         </div>
-        <button class="export-button" id="exportButton" onclick="generateWordDoc()">Eksportuj do Word (.doc)</button>
+        <button class="generate-button" onclick="generujSymulacje()">Generuj Tabelę Symulacji</button>
+    </div>
+
+    <div class="results-container" id="resultsContainer">
+        <div id="captureArea">
+            <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
+            <div class="simulation-table-wrapper">
+                <table id="resultsTable">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <button class="pdf-button" id="pdfButton" onclick="generatePDF()">Generuj Ofertę jako PDF</button>
     </div>
 </div>
 
 <script>
-    // Wszystkie funkcje pomocnicze i `generujSymulacje` pozostają bez zmian
+    // Cały skrypt pozostaje bez zmian
+    const formatCurrency = (value) => {
+        if (!value || isNaN(value)) return "-";
+        return value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
+    }
+    
+    function getPolishYearForm(number) {
+        if (number === 1) return 'rok';
+        const lastDigit = number % 10;
+        const lastTwoDigits = number % 100;
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return 'lat';
+        if (lastDigit >= 2 && lastDigit <= 4) return 'lata';
+        return 'lat';
+    }
 
-    // --- NOWA, POPRAWIONA FUNKCJA DO GENEROWANIA PLIKU .DOC ---
-    function generateWordDoc() {
-        // Sprawdzenie, czy są dane do wyeksportowania
-        if (document.querySelector("#resultsTable tbody").rows.length === 0) {
-            alert("Brak danych do wygenerowania pliku. Najpierw wygeneruj symulację.");
+    function addAmountInput() {
+        const container = document.getElementById('amountInputsContainer');
+        const newDiv = document.createElement('div');
+        newDiv.className = 'amount-input-container';
+        newDiv.innerHTML = `
+            <input type="number" class="kwota-input" placeholder="Kolejna kwota">
+            <button class="remove-button" onclick="removeAmountInput(this)">Usuń</button>
+        `;
+        container.appendChild(newDiv);
+    }
+    
+    function removeAmountInput(button) {
+        button.parentElement.remove();
+    }
+
+    function initializeCheckboxes() {
+        const container = document.getElementById('yearsCheckboxes');
+        const years = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+        let html = '';
+        years.forEach(year => {
+            const yearText = getPolishYearForm(year);
+            html += `
+                <div>
+                    <input type="checkbox" id="year_${year}" value="${year}">
+                    <label for="year_${year}">${year} ${yearText}</label>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function generujSymulacje() {
+        const rocznaStopa = parseFloat(document.getElementById('oprocentowanie').value) || 0;
+        const prowizjaProc = parseFloat(document.getElementById('prowizja').value) || 0;
+        const resultsContainer = document.getElementById('resultsContainer');
+        const tableHead = document.querySelector("#resultsTable thead");
+        const tableBody = document.querySelector("#resultsTable tbody");
+        
+        tableHead.innerHTML = '';
+        tableBody.innerHTML = ''; 
+
+        const kwoty = [];
+        document.querySelectorAll('.kwota-input').forEach(input => {
+            const val = parseFloat(input.value);
+            if (val > 0) {
+                kwoty.push(val);
+            }
+        });
+
+        const selectedYears = [];
+        document.querySelectorAll('#yearsCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
+            selectedYears.push(parseInt(checkbox.value));
+        });
+
+        if (kwoty.length === 0 || selectedYears.length === 0) {
+            resultsContainer.style.display = 'none';
+            alert("Proszę wpisać przynajmniej jedną kwotę i zaznaczyć przynajmniej jeden okres kredytowania.");
             return;
         }
-        
-        // Tworzenie kodu HTML, który zostanie umieszczony w pliku
-        // Dodajemy podstawowe style, aby tabela dobrze wyglądała w Wordzie
-        let header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-            "xmlns='http://www.w3.org/TR/REC-html40'>"+
-            "<head><meta charset='utf-8'><title>Symulacja Kredytowa</title></head><body>";
-        
-        let footer = "</body></html>";
-        
-        // Kopiowanie HTML z widocznej tabeli
-        let tableHTML = document.getElementById("resultsTable").outerHTML;
 
-        // Dodanie tytułu i parametrów
-        const oprocentowanie = document.getElementById('oprocentowanie').value;
-        const prowizja = document.getElementById('prowizja').value;
-        let sourceHTML = header +
-            `<h1>Symulacja Raty Miesięcznej</h1>` +
-            `<p>Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>` +
-            tableHTML +
-            footer;
+        const r = (rocznaStopa / 100) / 12;
 
-        // Tworzenie pliku do pobrania
-        let blob = new Blob(['\ufeff', sourceHTML], {
-            type: 'application/msword'
+        let headerHTML = '<tr><th>Kwota Kredytu</th>';
+        selectedYears.sort((a,b) => a-b).forEach(lata => {
+            const yearText = getPolishYearForm(lata);
+            headerHTML += `<th>${lata} ${yearText}</th>`;
+        });
+        headerHTML += '</tr>';
+        tableHead.innerHTML = headerHTML;
+        
+        kwoty.forEach(kwota => {
+            const newRow = tableBody.insertRow();
+            let rowHTML = `<td class="amount-header">${formatCurrency(kwota)}</td>`;
+
+            selectedYears.forEach(lata => {
+                const n = lata * 12;
+                const kwotaProwizji = kwota * (prowizjaProc / 100);
+                const P_financed = kwota + kwotaProwizji;
+                
+                let miesiecznaRata = 0;
+                if (P_financed > 0 && n > 0 && r > 0) {
+                    const pmt = P_financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                    miesiecznaRata = Math.round(pmt * 100) / 100;
+                }
+                rowHTML += `<td class="result-cell">${formatCurrency(miesiecznaRata)}</td>`;
+            });
+            newRow.innerHTML = rowHTML;
         });
         
-        let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-        
-        let filename = 'symulacja_kredytowa.doc';
-        
-        let downloadLink = document.createElement("a");
-        document.body.appendChild(downloadLink);
-        
-        if (navigator.msSaveOrOpenBlob) {
-            navigator.msSaveOrOpenBlob(blob, filename);
-        } else {
-            downloadLink.href = url;
-            downloadLink.download = filename;
-            downloadLink.click();
-        }
-        
-        document.body.removeChild(downloadLink);
+        resultsContainer.style.display = 'block';
     }
-    // Pozostała część skryptu JavaScript jest taka sama jak poprzednio...
+    
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const captureArea = document.getElementById('captureArea');
+        const pdfButton = document.getElementById('pdfButton');
+        
+        pdfButton.style.display = 'none';
+        
+        html2canvas(captureArea, {
+            backgroundColor: '#3a3a3a',
+            scale: 2 
+        }).then(canvas => {
+            pdfButton.style.display = 'block';
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'px',
+                format: [canvas.width + 40, canvas.height + 40] // Dodaj marginesy
+            });
+            pdf.addImage(imgData, 'PNG', 20, 20, canvas.width, canvas.height); // Dodaj marginesy
+            pdf.save("symulacja_kredytowa.pdf");
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeCheckboxes);
 </script>
 </body>
 </html>
