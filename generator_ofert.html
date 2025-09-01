@@ -9,55 +9,93 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .logo { height: 40px; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
-        .company-name { font-size: 1.5rem; font-weight: bold; color: #f9fafb; }
-        #toast { position: fixed; bottom: 20px; right: 20px; background-color: #1f2937; color: #f9fafb; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 4px solid #34d399; visibility: hidden; opacity: 0; transition: all 0.3s; z-index: 100; }
-        #toast.show { visibility: visible; opacity: 1; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        .page-header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 20px; 
+            margin-bottom: 30px;
+        }
+        .logo { 
+            height: 80px; 
+            border-radius: 8px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4); 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        h1.main-title { 
+            text-align: left; 
+            font-size: 2.25rem; 
+            font-weight: 900; 
+            margin: 0;
+            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        #toast { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            background-color: #1f2937; 
+            color: #f9fafb; 
+            padding: 15px 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            border-left: 4px solid #34d399; 
+            visibility: hidden; 
+            opacity: 0; 
+            transition: all 0.3s; 
+            z-index: 100; 
+        }
+        #toast.show { 
+            visibility: visible; 
+            opacity: 1; 
+        }
     </style>
 </head>
-<body class="bg-[#0A192F] text-[#CCD6F6] pt-8">
+<body class="bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
 
-    <div class="header">
+    <header class="page-header">
         <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
-        <span class="company-name">Kancelaria Analizy Finansowej</span>
-    </div>
+        <h1 class="main-title">Generator Oferty SKD</h1>
+    </header>
 
-    <div class="container mx-auto p-4 md:p-8">
-        <div class="bg-[#112240] rounded-lg shadow-lg p-8 border border-gray-700 max-w-2xl mx-auto">
-            <h1 class="text-3xl font-black text-white mb-6 text-center">Generator Oferty SKD</h1>
+    <div class="container mx-auto">
+        <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700 max-w-2xl mx-auto">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <label for="wps" class="block text-sm font-medium text-gray-400 mb-1">WPS (zł)</label>
-                    <input type="number" id="wps" placeholder="np. 27000" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
+                    <input type="number" id="wps" placeholder="np. 27000" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" oninput="saveData()">
                 </div>
                 <div>
                     <label for="savings" class="block text-sm font-medium text-gray-400 mb-1">Oszczędność na ratach (zł)</label>
-                    <input type="number" id="savings" placeholder="np. 28000" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
+                    <input type="number" id="savings" placeholder="np. 28000" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" oninput="saveData()">
                 </div>
                 <div>
                     <label for="upfrontFee" class="block text-sm font-medium text-gray-400 mb-1">Opłata wstępna (zł)</label>
-                    <input type="number" id="upfrontFee" placeholder="np. 6909.50" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
+                    <input type="number" id="upfrontFee" placeholder="np. 6909.50" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" oninput="saveData()">
                 </div>
                 <div>
                     <label for="successFee" class="block text-sm font-medium text-gray-400 mb-1">Success Fee dla Kancy (%)</label>
-                    <input type="number" id="successFee" placeholder="np. 10" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
+                    <input type="number" id="successFee" placeholder="np. 10" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" oninput="saveData()">
                 </div>
                  <div class="sm:col-span-2">
                     <label for="gender" class="block text-sm font-medium text-gray-400 mb-1">Forma grzecznościowa</label>
-                    <select id="gender" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" onchange="saveData()">
+                    <select id="gender" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" onchange="saveData()">
                         <option value="Pani">Pani</option>
                         <option value="Pana">Pana</option>
                     </select>
                 </div>
             </div>
-            <button id="generateBtn" class="w-full bg-[#FFC107] text-[#0A192F] font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-yellow-400 transition duration-300 text-xl mt-8">Generuj Link do Oferty</button>
+            <button id="generateBtn" class="w-full bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 text-xl mt-8">Generuj Link do Oferty</button>
             
             <div id="result" class="mt-8 hidden">
                 <label for="generatedLink" class="block text-sm font-medium text-gray-400 mb-1">Gotowy link dla klienta:</label>
-                <input type="text" id="generatedLink" readonly class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2">
-                <button id="copyBtn" class="w-full bg-gray-600 text-white font-bold py-2 px-4 rounded-lg mt-2 hover:bg-gray-500 transition duration-300">Kopiuj Link</button>
+                <input type="text" id="generatedLink" readonly class="w-full bg-gray-900 text-white border border-gray-700 rounded-md p-2">
+                <button id="copyBtn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg mt-2 transition-colors">Kopiuj Link</button>
             </div>
         </div>
     </div>
