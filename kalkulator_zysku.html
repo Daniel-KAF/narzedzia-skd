@@ -12,12 +12,13 @@
             color: #d1d5db;
             padding: 20px;
         }
-        .header {
+        .page-header {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 20px;
             margin-bottom: 30px;
+            text-align: center; /* Aby wyśrodkować blok tekstowy */
         }
         .logo {
             height: 80px;
@@ -26,7 +27,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         h1 {
-            text-align: left;
             font-size: 2.25rem;
             font-weight: 900;
             margin: 0;
@@ -55,7 +55,7 @@
             }
         }
         .card {
-            background-color: #1f2937;
+            background-color: #1f2937; /* Zachowaj tło dla każdej karty */
             display: flex;
             flex-direction: column;
         }
@@ -109,16 +109,23 @@
             color: #f9fafb;
             text-align: right;
         }
+        .table-subheader {
+            font-weight: 700;
+            color: #f9fafb; /* Biały dla lepszej widoczności */
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4b5563; /* Grubsza linia dla subheaderów */
+        }
         .total-row {
             border-top: 2px solid #4b5563;
         }
         .total-row td {
             font-size: 18px;
             font-weight: 700;
-            color: #f59e0b;
+            color: #f59e0b; /* Akcent kolorystyczny dla sumy */
         }
-        .green {
-             color: #34d399;
+        .green-text {
+             color: #34d399; /* Zielony dla zysków */
         }
         .action-button {
             font-size: 16px;
@@ -181,25 +188,29 @@
                     <thead>
                         <tr>
                             <th>Opis</th>
+                            <th style="text-align:right;">Netto</th>
                             <th style="text-align:right;">Brutto</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <th>Opłata sądowa</th>
+                            <td id="resCourtNet"></td>
                             <td id="resCourtGross"></td>
                         </tr>
                         <tr>
                             <th>Wynagrodzenie Kancelarii Prawnej</th>
+                            <td id="resLawyerNet"></td>
                             <td id="resLawyerGross"></td>
                         </tr>
                         <tr>
                             <th>Opłata KAF</th>
+                            <td id="resSurplusNet"></td>
                             <td id="resSurplusGross"></td>
                         </tr>
                         <tr class="total-row">
-                            <th>Razem opłaty wstępne</th>
-                            <td id="resTotalGross"></td>
+                            <th style="text-align:left;">Razem opłaty wstępne</th>
+                            <td></td> <td id="resTotalGross"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -216,24 +227,30 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <th colspan="2" class="table-subheader">Zysk Klienta</th>
+                        </tr>
+                        <tr>
                             <th>Zysk Klienta (1 rok)</th>
-                            <td id="resClientTotal1Y"></td>
+                            <td id="resClientTotal1Y" class="green-text"></td>
                         </tr>
                         <tr>
                             <th>Zysk Klienta (2 lata)</th>
-                            <td id="resClientTotal2Y"></td>
+                            <td id="resClientTotal2Y" class="green-text"></td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" class="table-subheader">Zysk Kancelarii</th>
                         </tr>
                         <tr>
                             <th>Zysk Kancelarii "Na start" (netto)</th>
-                            <td id="resFirmStartProfit" class="green"></td>
+                            <td id="resFirmStartProfit" class="green-text"></td>
                         </tr>
                         <tr>
                             <th>Success Fee Kancelarii (1 rok)</th>
-                            <td id="resFirmSF1Y" class="green"></td>
+                            <td id="resFirmSF1Y" class="green-text"></td>
                         </tr>
                          <tr>
                             <th>Success Fee Kancelarii (2 lata)</th>
-                            <td id="resFirmSF2Y" class="green"></td>
+                            <td id="resFirmSF2Y" class="green-text"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -259,7 +276,9 @@
         const interest = wps * interestRate;
         document.getElementById('interest').value = interest.toFixed(2);
         
-        const feeCourt = 1017.00;
+        const feeCourtNet = 1017.00; // Opłata sądowa jest zawsze brutto, więc netto jest takie samo
+        const feeCourtGross = 1017.00; 
+
         const feeLawyerNet = 2250.00;
         const vatRate = 0.23;
 
@@ -268,7 +287,7 @@
         
         const feeLawyerGross = feeLawyerNet * (1 + vatRate);
         const feeSurplusGross = feeSurplusNet * (1 + vatRate);
-        const totalFeeGross = feeCourt + feeLawyerGross + feeSurplusGross;
+        const totalFeeGross = feeCourtGross + feeLawyerGross + feeSurplusGross;
 
         const recovered1Y = wps + interest;
         const recovered2Y = wps + (interest * 2);
@@ -282,8 +301,11 @@
         const totalClientProfit2Y = clientReturn2Y + forgivenInterest;
 
         // Opłaty Klienta
-        document.getElementById('resCourtGross').textContent = formatCurrency(feeCourt);
+        document.getElementById('resCourtNet').textContent = formatCurrency(feeCourtNet);
+        document.getElementById('resCourtGross').textContent = formatCurrency(feeCourtGross);
+        document.getElementById('resLawyerNet').textContent = formatCurrency(feeLawyerNet);
         document.getElementById('resLawyerGross').textContent = formatCurrency(feeLawyerGross);
+        document.getElementById('resSurplusNet').textContent = formatCurrency(feeSurplusNet);
         document.getElementById('resSurplusGross').textContent = formatCurrency(feeSurplusGross);
         document.getElementById('resTotalGross').textContent = formatCurrency(totalFeeGross);
 
