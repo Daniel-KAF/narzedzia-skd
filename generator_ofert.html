@@ -10,66 +10,99 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .header { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .logo { height: 40px; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        .company-name { font-size: 1.5rem; font-weight: bold; color: #f9fafb; }
+        #toast { position: fixed; bottom: 20px; right: 20px; background-color: #1f2937; color: #f9fafb; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 4px solid #34d399; visibility: hidden; opacity: 0; transition: all 0.3s; z-index: 100; }
+        #toast.show { visibility: visible; opacity: 1; }
     </style>
 </head>
-<body class="bg-gray-900 text-white p-4 sm:p-6 lg:p-8">
+<body class="bg-[#0A192F] text-[#CCD6F6] pt-8">
+
+    <div class="header">
+        <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
+        <span class="company-name">Kancelaria Analizy Finansowej</span>
+    </div>
 
     <div class="container mx-auto p-4 md:p-8">
-        <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700 max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold text-white mb-6 text-center">Generator Oferty SKD</h1>
+        <div class="bg-[#112240] rounded-lg shadow-lg p-8 border border-gray-700 max-w-2xl mx-auto">
+            <h1 class="text-3xl font-black text-white mb-6 text-center">Generator Oferty SKD</h1>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                     <label for="wps" class="block text-sm font-medium text-gray-400 mb-1">WPS (zł)</label>
-                    <input type="number" id="wps" placeholder="np. 27000" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="number" id="wps" placeholder="np. 27000" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
                 </div>
                 <div>
                     <label for="savings" class="block text-sm font-medium text-gray-400 mb-1">Oszczędność na ratach (zł)</label>
-                    <input type="number" id="savings" placeholder="np. 28000" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="number" id="savings" placeholder="np. 28000" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
                 </div>
                 <div>
                     <label for="upfrontFee" class="block text-sm font-medium text-gray-400 mb-1">Opłata wstępna (zł)</label>
-                    <input type="number" id="upfrontFee" placeholder="np. 6909.50" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="number" id="upfrontFee" placeholder="np. 6909.50" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
                 </div>
                 <div>
                     <label for="successFee" class="block text-sm font-medium text-gray-400 mb-1">Success Fee dla Kancy (%)</label>
-                    <input type="number" id="successFee" placeholder="np. 10" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="number" id="successFee" placeholder="np. 10" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" oninput="saveData()">
                 </div>
                  <div class="sm:col-span-2">
                     <label for="gender" class="block text-sm font-medium text-gray-400 mb-1">Forma grzecznościowa</label>
-                    <select id="gender" class="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select id="gender" class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2 focus:ring-[#FFC107] focus:border-[#FFC107]" onchange="saveData()">
                         <option value="Pani">Pani</option>
                         <option value="Pana">Pana</option>
                     </select>
                 </div>
             </div>
-            <button id="generateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 text-xl mt-8">Generuj Link do Oferty</button>
+            <button id="generateBtn" class="w-full bg-[#FFC107] text-[#0A192F] font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-yellow-400 transition duration-300 text-xl mt-8">Generuj Link do Oferty</button>
             
             <div id="result" class="mt-8 hidden">
                 <label for="generatedLink" class="block text-sm font-medium text-gray-400 mb-1">Gotowy link dla klienta:</label>
-                <input type="text" id="generatedLink" readonly class="w-full bg-gray-900 text-white border border-gray-700 rounded-md p-2">
+                <input type="text" id="generatedLink" readonly class="w-full bg-[#0A192F] text-white border border-gray-600 rounded-md p-2">
                 <button id="copyBtn" class="w-full bg-gray-600 text-white font-bold py-2 px-4 rounded-lg mt-2 hover:bg-gray-500 transition duration-300">Kopiuj Link</button>
             </div>
         </div>
     </div>
+    <div id="toast"></div>
 
     <script>
+        const inputIds = ['wps', 'savings', 'upfrontFee', 'successFee', 'gender'];
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function saveData() {
+            inputIds.forEach(id => {
+                const element = document.getElementById(id);
+                localStorage.setItem(`offer_${id}`, element.value);
+            });
+        }
+
+        function loadData() {
+            inputIds.forEach(id => {
+                const savedValue = localStorage.getItem(`offer_${id}`);
+                if (savedValue) {
+                    document.getElementById(id).value = savedValue;
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadData);
+
         const generateBtn = document.getElementById('generateBtn');
         const resultDiv = document.getElementById('result');
         const generatedLinkInput = document.getElementById('generatedLink');
         const copyBtn = document.getElementById('copyBtn');
 
         generateBtn.addEventListener('click', () => {
-            const offerTemplateUrl = 'https://daniel-kaf.github.io/szablon-oferty/'; 
-
-            const wps = document.getElementById('wps').value;
-            const savings = document.getElementById('savings').value;
-            const upfrontFee = document.getElementById('upfrontFee').value;
-            const successFee = document.getElementById('successFee').value;
-            const gender = document.getElementById('gender').value;
-
-            const params = new URLSearchParams({ wps, savings, upfrontFee, successFee, gender });
+            const offerTemplateUrl = 'https://daniel-kaf.github.io/szablon-oferty/';
+            const params = new URLSearchParams();
+            inputIds.forEach(id => {
+                params.set(id, document.getElementById(id).value);
+            });
             const finalUrl = `${offerTemplateUrl}?${params.toString()}`;
-
             generatedLinkInput.value = finalUrl;
             resultDiv.classList.remove('hidden');
         });
@@ -77,10 +110,7 @@
         copyBtn.addEventListener('click', () => {
             generatedLinkInput.select();
             document.execCommand('copy');
-            copyBtn.textContent = 'Skopiowano!';
-            setTimeout(() => {
-                copyBtn.textContent = 'Kopiuj Link';
-            }, 2000);
+            showToast('Link skopiowano!');
         });
     </script>
 </body>
