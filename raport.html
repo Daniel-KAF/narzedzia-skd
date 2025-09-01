@@ -25,12 +25,19 @@
             const reportView = document.getElementById('report-view');
             
             const buildReportHtml = (reportData) => {
-                let { clientName, lenderName, agreementNumber, agreementDate, violations } = reportData;
+                // Odczytanie nowych danych
+                let { clientName, lenderName, agreementNumber, agreementDate, violations, analysisDate, advisorName } = reportData;
+                
                 agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
+                // Formatowanie daty analizy lub użycie dzisiejszej, jeśli nie podano
+                analysisDate = analysisDate ? new Date(analysisDate).toLocaleDateString('pl-PL') : new Date().toLocaleDateString('pl-PL');
+                
+                // Ustawienie domyślnej wartości dla doradcy, jeśli pole jest puste
+                advisorName = advisorName || '[Imię i nazwisko doradcy]';
 
                 let reportHTML = `
                     <h3 style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 2rem; color: white;">WSTĘPNA ANALIZA PRAWNA UMOWY KREDYTOWEJ NR ${agreementNumber}</h3>
-                    <p><strong>Data sporządzenia:</strong> ${new Date().toLocaleDateString('pl-PL')}</p>
+                    <p><strong>Data sporządzenia:</strong> ${analysisDate}</p>
                     <p><strong>Dotyczy:</strong> Umowy o kredyt konsumencki z dnia ${agreementDate} zawartej pomiędzy ${clientName} a ${lenderName}.</p>
                     <br>
                     <p>Szanowni Państwo,</p>
@@ -53,15 +60,15 @@
                     reportHTML += `<p>Nie wprowadzono żadnych naruszeń.</p>`;
                 }
 
+                // Nowy, dynamiczny podpis
                 reportHTML += `
                     <br>
                     <p>Powyższe naruszenia dają podstawy do podjęcia działań prawnych. Rekomendujemy dalsze kroki w tej sprawie.</p>
-                    <p>Z poważaniem,<br>[Twoja Nazwa Firmy]</p>`;
+                    <p>Z poważaniem,<br>${advisorName}<br>Kancelaria Analizy Finansowej</p>`;
 
                 return reportHTML;
             };
 
-            // Nowa, niezawodna metoda odczytywania danych
             const params = new URLSearchParams(window.location.search);
             const jsonData = params.get('data');
 
