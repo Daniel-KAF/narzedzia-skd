@@ -5,115 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Kredytowy</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Source+Sans+Pro:wght@400;600&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         body {
-            font-family: 'Source Sans Pro', sans-serif;
-            /* GŁÓWNA ZMIANA: Ciepłe, kremowe tło */
-            background-color: #F0EBE3; 
-            color: #4F4A45; /* Ciemny, ciepły brąz zamiast czerni */
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Ciemne tło */
+            color: #d1d5db;
             margin: 0;
             padding: 20px;
         }
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 20px auto;
-            /* Jaśniejszy, papierowy kolor dla kontenera */
-            background-color: #FAF8F4;
+            background-color: #1f2937; /* Ciemny kontener */
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
-            border: 1px solid #E4DCD0;
+            border: 1px solid #374151;
         }
         h2 {
             text-align: center;
-            color: #4F4A45;
             margin-bottom: 30px;
-            font-family: 'Lora', serif; /* Elegancka czcionka dla nagłówka */
-            font-weight: 700;
+            font-weight: 900;
+            font-size: 2.25rem;
+            /* Styl gradientu dla tytułu */
+            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        
-        .input-section {
+        .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 40px;
+        }
+        .input-section, .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         .input-group {
-            position: relative;
+            background-color: #374151;
+            padding: 10px 15px;
+            border-radius: 8px;
         }
         .input-group label {
             display: block;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 14px;
-            margin-bottom: 8px;
-            color: #8A817C;
+            margin-bottom: 5px;
+            color: #9ca3af;
         }
         input {
             width: 100%;
-            padding: 12px;
-            background-color: #F8F5F1;
-            color: #4F4A45;
-            border: 1px solid #DCD3C4;
-            border-radius: 8px;
+            padding: 10px;
+            background-color: #4b5563;
+            color: #f9fafb;
+            border: 1px solid #6b7280;
+            border-radius: 6px;
             font-size: 16px;
             box-sizing: border-box;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #5F6F52; /* Oliwkowy akcent */
-            box-shadow: 0 0 0 3px rgba(95, 111, 82, 0.15);
         }
         
-        .results-grid {
-            display: grid;
-            gap: 15px;
-            grid-template-columns: 1fr 1fr;
+        .results-section {
+            gap: 12px;
         }
-        .result-card {
-            background-color: #F8F5F1;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #E4DCD0;
+        .result-box {
+            background-color: #374151;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #4b5563;
         }
         .result-label {
             font-size: 14px;
-            color: #8A817C;
-            margin: 0 0 5px 0;
+            color: #9ca3af;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin: 0;
         }
         .result-value {
-            font-size: 22px;
+            font-size: 26px;
             font-weight: 600;
-            color: #4F4A45;
             margin: 0;
-            font-family: 'Lora', serif;
+            color: #f9fafb;
         }
 
-        /* Wyróżnienie głównego wyniku w oliwkowym kolorze */
-        .result-card.highlight {
-            grid-column: 1 / -1;
-            text-align: center;
-            background-color: #5F6F52; /* Oliwkowy */
-            color: #FAF8F4;
-            border: none;
+        .result-box.highlight {
+            border-left-color: #34d399;
         }
-        .result-card.highlight .result-label {
-            color: #D6DCD4;
-        }
-        .result-card.highlight .result-value {
-            font-size: 42px;
+        .result-value.highlight-value {
+            color: #34d399;
             font-weight: 700;
-            color: #ffffff;
+            font-size: 28px;
         }
-
-        @media (max-width: 600px) {
-            .input-section, .results-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 20px;
-            }
+        .result-value.secondary-value {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        @media (max-width: 800px) {
+            .main-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -122,41 +113,43 @@
 <div class="container">
     <h2>Kalkulator Kredytowy</h2>
 
-    <div class="input-section">
-        <div class="input-group">
-            <label for="kwota">Kwota kredytu (zł)</label>
-            <input type="number" id="kwota" value="100000" oninput="obliczKredyt()">
+    <div class="main-grid">
+        <div class="input-section">
+            <div class="input-group">
+                <label for="kwota">Kwota kredytu (zł)</label>
+                <input type="number" id="kwota" value="100000" oninput="obliczKredyt()">
+            </div>
+            <div class="input-group">
+                <label for="oprocentowanie">Oprocentowanie roczne (%)</label>
+                <input type="number" id="oprocentowanie" value="8.99" step="0.01" oninput="obliczKredyt()">
+            </div>
+            <div class="input-group">
+                <label for="okres">Okres kredytowania (miesiące)</label>
+                <input type="number" id="okres" value="120" oninput="obliczKredyt()">
+            </div>
+            <div class="input-group">
+                <label for="prowizja">Prowizja bankowa (%)</label>
+                <input type="number" id="prowizja" value="2.39" step="0.01" oninput="obliczKredyt()">
+            </div>
         </div>
-        <div class="input-group">
-            <label for="okres">Okres (miesiące)</label>
-            <input type="number" id="okres" value="120" oninput="obliczKredyt()">
-        </div>
-        <div class="input-group">
-            <label for="oprocentowanie">Oprocentowanie (%)</label>
-            <input type="number" id="oprocentowanie" value="8.99" step="0.01" oninput="obliczKredyt()">
-        </div>
-        <div class="input-group">
-            <label for="prowizja">Prowizja (%)</label>
-            <input type="number" id="prowizja" value="2.39" step="0.01" oninput="obliczKredyt()">
-        </div>
-    </div>
 
-    <div class="results-grid">
-        <div class="result-card highlight">
-            <p class="result-label">Miesięczna rata</p>
-            <p class="result-value" id="wynikRata">0,00 zł</p>
-        </div>
-        <div class="result-card">
-            <p class="result-label">Koszt odsetek</p>
-            <p class="result-value" id="wynikOdsetki">0,00 zł</p>
-        </div>
-         <div class="result-card">
-            <p class="result-label">Koszt prowizji</p>
-            <p class="result-value" id="wynikProwizja">0,00 zł</p>
-        </div>
-        <div class="result-card" style="grid-column: 1 / -1;">
-            <p class="result-label">Całkowita kwota do spłaty</p>
-            <p class="result-value" id="wynikKwotaDoSplaty">0,00 zł</p>
+        <div class="results-section">
+            <div class="result-box highlight">
+                <p class="result-label">Miesięczna rata</p>
+                <p class="result-value highlight-value" id="wynikRata">0,00 zł</p>
+            </div>
+            <div class="result-box">
+                <p class="result-label">Całkowity koszt odsetek</p>
+                <p class="result-value secondary-value" id="wynikOdsetki">0,00 zł</p>
+            </div>
+            <div class="result-box">
+                <p class="result-label">Całkowity koszt kredytu</p>
+                <p class="result-value" id="wynikKosztCalkowity">0,00 zł</p>
+            </div>
+             <div class="result-box">
+                <p class="result-label">Całkowita kwota do spłaty</p>
+                <p class="result-value" id="wynikKwotaDoSplaty">0,00 zł</p>
+            </div>
         </div>
     </div>
 </div>
@@ -178,6 +171,7 @@
         let miesiecznaRata = 0;
         let calkowitaKwotaDoSplaty = 0;
         let calkowityKosztOdsetek = 0;
+        let calkowityKosztKredytu = 0;
 
         if (P_financed > 0 && n > 0 && r > 0) {
             const pmt = P_financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
@@ -185,11 +179,12 @@
 
             calkowitaKwotaDoSplaty = miesiecznaRata * n;
             calkowityKosztOdsetek = calkowitaKwotaDoSplaty - P_financed;
+            calkowityKosztKredytu = calkowityKosztOdsetek + kwotaProwizji;
         }
         
         document.getElementById('wynikRata').textContent = formatCurrency(miesiecznaRata);
         document.getElementById('wynikOdsetki').textContent = formatCurrency(calkowityKosztOdsetek);
-        document.getElementById('wynikProwizja').textContent = formatCurrency(kwotaProwizji);
+        document.getElementById('wynikKosztCalkowity').textContent = formatCurrency(calkowityKosztKredytu);
         document.getElementById('wynikKwotaDoSplaty').textContent = formatCurrency(calkowitaKwotaDoSplaty);
     }
 
