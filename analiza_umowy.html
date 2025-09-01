@@ -46,7 +46,7 @@
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Krok 2: Wprowadź naruszone artykuły Ustawy</h2>
                 <div id="violations-container" class="space-y-4">
-                    </div>
+                </div>
                 <div class="mt-4">
                     <button id="add-violation-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors">
                         <i class="fas fa-plus mr-2"></i>Dodaj kolejne naruszenie
@@ -72,19 +72,17 @@
     </div>
 
     <script>
-        // Baza danych z naruszeniami
-        const flawsData = [
-            { id: 'maxCostsExceeded', identifiers: ['36a'], label: 'Przekroczenie maksymalnych pozaodsetkowych kosztów kredytu', title: 'Naruszenie w zakresie maksymalnych pozaodsetkowych kosztów kredytu', legalBasis: 'Art. 36a ustawy o kredycie konsumenckim.', explanation: 'Zidentyfikowano, że suma kosztów pozaodsetkowych (takich jak prowizja, opłaty administracyjne, koszty ubezpieczeń) nałożonych na Kredytobiorcę przekracza ustawowy limit. Celem tego przepisu jest ochrona konsumenta przed lichwą i ukrywaniem realnego kosztu kredytu. Obciążenie kredytobiorcy kosztami przewyższającymi ustawowy limit jest rażącym naruszeniem prawa i stanowi jedną z najczęstszych podstaw do zastosowania sankcji kredytu darmowego.' },
-            { id: 'incorrectTotalAmount', identifiers: ['5.7', '30.1.2'], label: 'Nieprawidłowe zdefiniowanie całkowitej kwoty kredytu (kredytowanie kosztów)', title: 'Nieprawidłowe określenie całkowitej kwoty kredytu', legalBasis: 'Art. 5 pkt 7 oraz art. 30 ust. 1 pkt 2 ustawy o kredycie konsumenckim.', explanation: 'W umowie do "całkowitej kwoty kredytu" wliczono koszty takie jak prowizja czy składka ubezpieczeniowa, które zostały potrącone przez bank z góry i nigdy nie zostały fizycznie udostępnione Kredytobiorcy. Taka praktyka sztucznie zawyża kwotę kredytu, co wprowadza konsumenta w błąd, prowadzi do nieprawidłowego naliczenia odsetek (które są liczone od wyższej podstawy) oraz do błędnego wyliczenia wskaźnika RRSO.' },
-            { id: 'noProportionalRefund', identifiers: ['49'], label: 'Brak proporcjonalnego zwrotu kosztów przy wcześniejszej spłacie', title: 'Naruszenie zasad rozliczenia kredytu w przypadku wcześniejszej spłaty', legalBasis: 'Art. 49 ustawy o kredycie konsumenckim oraz wyrok Trybunału Sprawiedliwości UE w sprawie C-383/18 (Lex-Kam).', explanation: 'Umowa nie gwarantuje proporcjonalnego obniżenia i zwrotu wszystkich kosztów kredytu (w tym prowizji i opłat jednorazowych) w przypadku jego spłaty przed terminem. Zgodnie z prawem, jeśli konsument spłaca kredyt wcześniej, całkowity koszt kredytu musi ulec obniżeniu o te koszty, które dotyczą okresu, o który skrócono czas obowiązywania umowy. Zapisy umowne, które to wyłączają lub ograniczają, są niezgodne z prawem.' },
-            { id: 'incorrectAprc', identifiers: ['30.1.7'], label: 'Błędnie obliczona Rzeczywista Roczna Stopa Oprocentowania (RRSO)', title: 'Wadliwe określenie Rzeczywistej Rocznej Stopy Oprocentowania (RRSO)', legalBasis: 'Art. 30 ust. 1 pkt 7 oraz załącznik nr 4 do ustawy o kredycie konsumenckim.', explanation: 'Wskaźnik RRSO podany w umowie został obliczony nieprawidłowo, najczęściej poprzez nieuwzględnienie w kalkulacji wszystkich wymaganych kosztów kredytu. RRSO to kluczowy wskaźnik, który ma umożliwić konsumentowi realne porównanie ofert. Jego błędne, zaniżone wyliczenie stanowi poważne naruszenie obowiązków informacyjnych, ponieważ wprowadza konsumenta w błąd co do faktycznej ceny kredytu.' },
-            { id: 'missingInfoForm', identifiers: ['13', '14', '29'], label: 'Brak lub wadliwy formularz informacyjny przed zawarciem umowy', title: 'Naruszenie obowiązku informacyjnego przed zawarciem umowy', legalBasis: 'Art. 13, 14 i 29 ustawy o kredycie konsumenckim.', explanation: 'Kredytodawca ma obowiązek przekazać konsumentowi, przed zawarciem umowy, formularz informacyjny na trwałym nośniku, zawierający wszystkie kluczowe dane dotyczące kredytu. Brak tego dokumentu, jego niekompletność lub przekazanie go w nietrwałej formie uniemożliwia konsumentowi podjęcie świadomej decyzji i stanowi podstawę do skorzystania z sankcji kredytu darmowego.' },
-            { id: 'withdrawalIssues', identifiers: ['30.1.16', '53'], label: 'Brak lub niepełne informacje o prawie do odstąpienia od umowy', title: 'Nieprawidłowe informacje dotyczące prawa do odstąpienia od umowy', legalBasis: 'Art. 30 ust. 1 pkt 16 oraz art. 53 ustawy o kredycie konsumenckim.', explanation: 'Umowa musi zawierać precyzyjne i kompletne informacje o procedurze, terminie oraz skutkach odstąpienia od umowy, w tym wzór oświadczenia o odstąpieniu. Wszelkie braki lub nieścisłości w tym zakresie naruszają prawa konsumenta i mogą stanowić przesłankę do zastosowania sankcji.' },
-            { id: 'missingElements', identifiers: ['30', '30.1'], label: 'Brak innych obligatoryjnych elementów umowy', title: 'Brak w umowie wszystkich wymaganych elementów', legalBasis: 'Art. 30 ust. 1 ustawy o kredycie konsumenckim.', explanation: 'Ustawa o kredycie konsumenckim wymienia szereg obowiązkowych elementów, które muszą znaleźć się w każdej umowie (np. dane stron, rodzaj kredytu, czas obowiązywania, stopa oprocentowania). Brak któregokolwiek z tych elementów stanowi naruszenie, które kwalifikuje umowę do sankcji kredytu darmowego, ponieważ umowa jest niekompletna i nie spełnia wymogów prawnych.' },
-        ];
-        
-        // --- Inicjalizacja widoku generatora ---
-        const initGenerator = () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            const flawsData = [
+                { id: 'maxCostsExceeded', identifiers: ['36a'], label: 'Przekroczenie maksymalnych pozaodsetkowych kosztów kredytu', title: 'Naruszenie w zakresie maksymalnych pozaodsetkowych kosztów kredytu', legalBasis: 'Art. 36a ustawy o kredycie konsumenckim.', explanation: 'Zidentyfikowano, że suma kosztów pozaodsetkowych (takich jak prowizja, opłaty administracyjne, koszty ubezpieczeń) nałożonych na Kredytobiorcę przekracza ustawowy limit. Celem tego przepisu jest ochrona konsumenta przed lichwą i ukrywaniem realnego kosztu kredytu. Obciążenie kredytobiorcy kosztami przewyższającymi ustawowy limit jest rażącym naruszeniem prawa i stanowi jedną z najczęstszych podstaw do zastosowania sankcji kredytu darmowego.' },
+                { id: 'incorrectTotalAmount', identifiers: ['5.7', '30.1.2'], label: 'Nieprawidłowe zdefiniowanie całkowitej kwoty kredytu (kredytowanie kosztów)', title: 'Nieprawidłowe określenie całkowitej kwoty kredytu', legalBasis: 'Art. 5 pkt 7 oraz art. 30 ust. 1 pkt 2 ustawy o kredycie konsumenckim.', explanation: 'W umowie do "całkowitej kwoty kredytu" wliczono koszty takie jak prowizja czy składka ubezpieczeniowa, które zostały potrącone przez bank z góry i nigdy nie zostały fizycznie udostępnione Kredytobiorcy. Taka praktyka sztucznie zawyża kwotę kredytu, co wprowadza konsumenta w błąd, prowadzi do nieprawidłowego naliczenia odsetek (które są liczone od wyższej podstawy) oraz do błędnego wyliczenia wskaźnika RRSO.' },
+                { id: 'noProportionalRefund', identifiers: ['49'], label: 'Brak proporcjonalnego zwrotu kosztów przy wcześniejszej spłacie', title: 'Naruszenie zasad rozliczenia kredytu w przypadku wcześniejszej spłaty', legalBasis: 'Art. 49 ustawy o kredycie konsumenckim oraz wyrok Trybunału Sprawiedliwości UE w sprawie C-383/18 (Lex-Kam).', explanation: 'Umowa nie gwarantuje proporcjonalnego obniżenia i zwrotu wszystkich kosztów kredytu (w tym prowizji i opłat jednorazowych) w przypadku jego spłaty przed terminem. Zgodnie z prawem, jeśli konsument spłaca kredyt wcześniej, całkowity koszt kredytu musi ulec obniżeniu o te koszty, które dotyczą okresu, o który skrócono czas obowiązywania umowy. Zapisy umowne, które to wyłączają lub ograniczają, są niezgodne z prawem.' },
+                { id: 'incorrectAprc', identifiers: ['30.1.7'], label: 'Błędnie obliczona Rzeczywista Roczna Stopa Oprocentowania (RRSO)', title: 'Wadliwe określenie Rzeczywistej Rocznej Stopy Oprocentowania (RRSO)', legalBasis: 'Art. 30 ust. 1 pkt 7 oraz załącznik nr 4 do ustawy o kredycie konsumenckim.', explanation: 'Wskaźnik RRSO podany w umowie został obliczony nieprawidłowo, najczęściej poprzez nieuwzględnienie w kalkulacji wszystkich wymaganych kosztów kredytu. RRSO to kluczowy wskaźnik, który ma umożliwić konsumentowi realne porównanie ofert. Jego błędne, zaniżone wyliczenie stanowi poważne naruszenie obowiązków informacyjnych, ponieważ wprowadza konsumenta w błąd co do faktycznej ceny kredytu.' },
+                { id: 'missingInfoForm', identifiers: ['13', '14', '29'], label: 'Brak lub wadliwy formularz informacyjny przed zawarciem umowy', title: 'Naruszenie obowiązku informacyjnego przed zawarciem umowy', legalBasis: 'Art. 13, 14 i 29 ustawy o kredycie konsumenckim.', explanation: 'Kredytodawca ma obowiązek przekazać konsumentowi, przed zawarciem umowy, formularz informacyjny na trwałym nośniku, zawierający wszystkie kluczowe dane dotyczące kredytu. Brak tego dokumentu, jego niekompletność lub przekazanie go w nietrwałej formie uniemożliwia konsumentowi podjęcie świadomej decyzji i stanowi podstawę do skorzystania z sankcji kredytu darmowego.' },
+                { id: 'withdrawalIssues', identifiers: ['30.1.16', '53'], label: 'Brak lub niepełne informacje o prawie do odstąpienia od umowy', title: 'Nieprawidłowe informacje dotyczące prawa do odstąpienia od umowy', legalBasis: 'Art. 30 ust. 1 pkt 16 oraz art. 53 ustawy o kredycie konsumenckim.', explanation: 'Umowa musi zawierać precyzyjne i kompletne informacje o procedurze, terminie oraz skutkach odstąpienia od umowy, w tym wzór oświadczenia o odstąpieniu. Wszelkie braki lub nieścisłości w tym zakresie naruszają prawa konsumenta i mogą stanowić przesłankę do zastosowania sankcji.' },
+                { id: 'missingElements', identifiers: ['30', '30.1'], label: 'Brak innych obligatoryjnych elementów umowy', title: 'Brak w umowie wszystkich wymaganych elementów', legalBasis: 'Art. 30 ust. 1 ustawy o kredycie konsumenckim.', explanation: 'Ustawa o kredycie konsumenckim wymienia szereg obowiązkowych elementów, które muszą znaleźć się w każdej umowie (np. dane stron, rodzaj kredytu, czas obowiązywania, stopa oprocentowania). Brak któregokolwiek z tych elementów stanowi naruszenie, które kwalifikuje umowę do sankcji kredytu darmowego, ponieważ umowa jest niekompletna i nie spełnia wymogów prawnych.' },
+            ];
+
             const violationsContainer = document.getElementById('violations-container');
             const addViolationBtn = document.getElementById('add-violation-btn');
             let violationCounter = 0;
@@ -183,13 +181,12 @@
                       return;
                 }
                 
-                // Poprawne kodowanie danych, w tym polskich znaków
+                // --- POPRAWIONA SEKCJA KODOWANIA I TWORZENIA LINKU ---
                 const jsonData = JSON.stringify(reportData);
                 const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
                 
-                // Poprawne budowanie URL
-                const baseURL = window.location.href.split('/').slice(0, -1).join('/') + '/raport.html';
-                const url = `${baseURL}#data=${encodeURIComponent(base64Data)}`;
+                const baseURL = 'raport.html';
+                const url = `${baseURL}#data=${base64Data}`;
                 
                 document.getElementById('generated-link').value = url;
                 document.getElementById('link-container').classList.remove('hidden');
@@ -205,13 +202,8 @@
                 btn.innerText = 'Skopiowano!';
                 setTimeout(() => { btn.innerText = originalText; }, 1500);
             });
-        };
-        
-        // Ta funkcja tu nie jest potrzebna, powinna być tylko w raporcie
-        // const renderReportFromURL = () => { ... }; 
-
-        // Główna logika - po prostu uruchom generator
-        initGenerator();
+            
+        });
     </script>
 </body>
 </html>
