@@ -51,7 +51,8 @@
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Krok 2: Wprowadź naruszone artykuły Ustawy</h2>
                 <div id="violations-container" class="space-y-4">
-                    </div>
+                    <!-- Dynamiczne wiersze naruszeń -->
+                </div>
                 <div class="mt-4">
                     <button id="add-violation-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md text-sm transition-colors">
                         <i class="fas fa-plus mr-2"></i>Dodaj kolejne naruszenie
@@ -61,7 +62,7 @@
             
             <div class="text-center">
                  <button id="generate-btn" class="bg-gradient-to-r from-blue-500 to-teal-400 hover:from-blue-600 hover:to-teal-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                    Generuj Link do Analizy
+                    Generuj Link do Oferty
                 </button>
             </div>
 
@@ -71,16 +72,16 @@
                  <div class="flex space-x-2">
                     <input id="generated-link" type="text" readonly class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-300">
                     <button id="copy-link-btn" class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-md">Kopiuj</button>
-                </div>
+                 </div>
             </div>
         </main>
     </div>
 
     <div id="report-view" class="hidden">
-        </div>
+        <!-- Raport zostanie wstrzyknięty tutaj -->
+    </div>
 
     <script>
-        // Baza danych z naruszeniami
         const flawsData = [
             { id: 'maxCostsExceeded', identifiers: ['36a'], label: 'Przekroczenie maksymalnych pozaodsetkowych kosztów kredytu', title: 'Naruszenie w zakresie maksymalnych pozaodsetkowych kosztów kredytu', legalBasis: 'Art. 36a ustawy o kredycie konsumenckim.', explanation: 'Zidentyfikowano, że suma kosztów pozaodsetkowych (takich jak prowizja, opłaty administracyjne, koszty ubezpieczeń) nałożonych na Kredytobiorcę przekracza ustawowy limit. Celem tego przepisu jest ochrona konsumenta przed lichwą i ukrywaniem realnego kosztu kredytu. Obciążenie kredytobiorcy kosztami przewyższającymi ustawowy limit jest rażącym naruszeniem prawa i stanowi jedną z najczęstszych podstaw do zastosowania sankcji kredytu darmowego.' },
             { id: 'incorrectTotalAmount', identifiers: ['5.7', '30.1.2'], label: 'Nieprawidłowe zdefiniowanie całkowitej kwoty kredytu (kredytowanie kosztów)', title: 'Nieprawidłowe określenie całkowitej kwoty kredytu', legalBasis: 'Art. 5 pkt 7 oraz art. 30 ust. 1 pkt 2 ustawy o kredycie konsumenckim.', explanation: 'W umowie do "całkowitej kwoty kredytu" wliczono koszty takie jak prowizja czy składka ubezpieczeniowa, które zostały potrącone przez bank z góry i nigdy nie zostały fizycznie udostępnione Kredytobiorcy. Taka praktyka sztucznie zawyża kwotę kredytu, co wprowadza konsumenta w błąd, prowadzi do nieprawidłowego naliczenia odsetek (które są liczone od wyższej podstawy) oraz do błędnego wyliczenia wskaźnika RRSO.' },
@@ -91,7 +92,6 @@
             { id: 'missingElements', identifiers: ['30', '30.1'], label: 'Brak innych obligatoryjnych elementów umowy', title: 'Brak w umowie wszystkich wymaganych elementów', legalBasis: 'Art. 30 ust. 1 ustawy o kredycie konsumenckim.', explanation: 'Ustawa o kredycie konsumenckim wymienia szereg obowiązkowych elementów, które muszą znaleźć się w każdej umowie (np. dane stron, rodzaj kredytu, czas obowiązywania, stopa oprocentowania). Brak któregokolwiek z tych elementów stanowi naruszenie, które kwalifikuje umowę do sankcji kredytu darmowego, ponieważ umowa jest niekompletna i nie spełnia wymogów prawnych.' },
         ];
 
-        // Funkcja do budowania raportu (używana przez raport.html)
         const buildReportHtml = (reportData) => {
             let { clientName, lenderName, agreementNumber, agreementDate, violations } = reportData;
             agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
@@ -126,7 +126,26 @@
                 </div>`;
             return reportHTML;
         };
-        
+
+        const renderReportFromURL = () => {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#data=')) {
+                try {
+                    const base64Data = hash.substring(6);
+                    const jsonData = atob(decodeURIComponent(base64Data));
+                    const reportData = JSON.parse(jsonData);
+
+                    document.getElementById('generator-view').style.display = 'none';
+                    const reportView = document.getElementById('report-view');
+                    reportView.innerHTML = buildReportHtml(reportData);
+                    reportView.style.display = 'block';
+                } catch (e) {
+                    console.error("Błąd podczas dekodowania danych z URL:", e);
+                    // Opcjonalnie: Pokaż błąd użytkownikowi
+                }
+            }
+        };
+
         // --- Inicjalizacja widoku generatora ---
         const initGenerator = () => {
             const violationsContainer = document.getElementById('violations-container');
@@ -141,6 +160,7 @@
 
             const addViolationRow = () => {
                 violationCounter++;
+                const id = `v-${violationCounter}`;
                 const div = document.createElement('div');
                 div.className = 'bg-gray-700 p-4 rounded-md violation-row';
                 div.innerHTML = `
@@ -153,7 +173,7 @@
                             <label class="block text-sm font-medium text-gray-300 mb-1">Artykuł / Ustęp / Punkt</label>
                             <div class="flex space-x-2">
                                 <input type="text" data-part="article" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Art./§">
-                                <input type="text" data-part="ustep" class="w-1/th bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Ust.">
+                                <input type="text" data-part="ustep" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Ust.">
                                 <input type="text" data-part="punkt" class="w-1/3 bg-gray-800 rounded-md p-1.5 text-sm" placeholder="Pkt.">
                             </div>
                             <input type="hidden" data-part="flaw-id">
@@ -214,24 +234,22 @@
                 });
 
                 if (reportData.violations.length === 0) {
-                      const btn = document.getElementById('generate-btn');
-                      const originalText = btn.innerText;
-                      btn.innerText = 'Wprowadź poprawne artykuły!';
-                      btn.classList.add('bg-red-500', 'hover:bg-red-600');
-                      btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
-                      setTimeout(() => {
-                          btn.innerText = originalText;
-                          btn.classList.remove('bg-red-500', 'hover:bg-red-600');
-                          btn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
-                      }, 2000);
-                      return;
+                     const btn = document.getElementById('generate-btn');
+                    const originalText = btn.innerText;
+                    btn.innerText = 'Wprowadź poprawne artykuły!';
+                    btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                    btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        btn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                    }, 2000);
+                    return;
                 }
                 
                 const jsonData = JSON.stringify(reportData);
-                const base64Data = btoa(unescape(encodeURIComponent(jsonData))); // Poprawne kodowanie polskich znaków
-                
-                const baseURL = window.location.href.split('#')[0].replace('analiza_umowy.html', 'raport.html');
-                const url = `${baseURL}#data=${encodeURIComponent(base64Data)}`;
+                const base64Data = btoa(jsonData);
+                const url = `${window.location.href.split('#')[0]}#data=${encodeURIComponent(base64Data)}`;
                 
                 document.getElementById('generated-link').value = url;
                 document.getElementById('link-container').classList.remove('hidden');
@@ -251,21 +269,8 @@
 
         // Główna logika - sprawdź, w jakim trybie uruchomić stronę
         window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#data=')) {
-                try {
-                    const base64Data = hash.substring(6);
-                    const jsonData = decodeURIComponent(escape(atob(base64Data))); // Poprawne dekodowanie
-                    const reportData = JSON.parse(jsonData);
-
-                    document.getElementById('generator-view').style.display = 'none';
-                    const reportView = document.getElementById('report-view');
-                    reportView.innerHTML = buildReportHtml(reportData);
-                    reportView.style.display = 'block';
-                } catch (e) {
-                    console.error("Błąd podczas dekodowania danych z URL:", e);
-                    initGenerator(); // Pokaż generator, jeśli link jest zły
-                }
+            if (window.location.hash.startsWith('#data=')) {
+                renderReportFromURL();
             } else {
                 initGenerator();
             }
@@ -273,3 +278,4 @@
     </script>
 </body>
 </html>
+
