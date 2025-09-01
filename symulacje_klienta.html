@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Symulacje Kredytowe dla Klienta</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Source+Sans+Pro:wght@400;600;700&display=swap');
 
@@ -142,33 +140,32 @@
             border-radius: 10px;
         }
         
-        /* === ZAKTUALIZOWANE STYLE TABELI === */
         .simulation-table-wrapper {
             overflow-x: auto;
         }
         table {
             width: 100%;
-            border-collapse: collapse; /* Łączymy ramki */
+            border-collapse: collapse;
             font-size: 16px;
         }
         th, td {
-            padding: 15px; /* Więcej przestrzeni */
-            text-align: right; /* Domyślnie wyrównanie do prawej dla liczb */
-            border: none; /* Usuwamy pionowe ramki */
-            border-bottom: 1px solid #525252; /* Tylko poziome linie */
+            padding: 15px;
+            text-align: right;
+            border: none;
+            border-bottom: 1px solid #525252;
         }
         th {
             font-family: 'Lora', serif;
             font-weight: 600;
             color: #e0e0e0;
-            background-color: transparent; /* Usunięte tło */
-            text-transform: uppercase; /* Wielkie litery */
+            background-color: transparent;
+            text-transform: uppercase;
             font-size: 13px;
             letter-spacing: 0.5px;
             color: #aaa;
         }
         th:first-child, td:first-child {
-            text-align: left; /* Pierwsza kolumna do lewej */
+            text-align: left;
         }
         td.amount-header {
             font-weight: bold;
@@ -179,19 +176,19 @@
             font-weight: 600;
             font-size: 18px;
             color: #81c784;
-            font-family: 'Source Code Pro', monospace; /* Czcionka o stałej szerokości dla liczb */
+            font-family: 'Source Code Pro', monospace;
         }
         tbody tr:hover {
-            background-color: #424242; /* Efekt podświetlenia wiersza */
+            background-color: #424242;
         }
         
-        .pdf-button {
+        .export-button {
             width: auto;
             padding: 12px 25px;
             font-size: 16px;
             font-weight: 600;
             color: #fff;
-            background-color: #f57c00;
+            background-color: #2196F3; /* Niebieski dla Worda */
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -201,7 +198,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .pdf-button:hover { background-color: #e65100; }
+        .export-button:hover { background-color: #1976D2; }
     </style>
 </head>
 <body>
@@ -237,21 +234,18 @@
     </div>
 
     <div class="results-container" id="resultsContainer">
-        <div id="captureArea">
-            <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
-            <div class="simulation-table-wrapper">
-                <table id="resultsTable">
-                    <thead></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+        <h3 style="font-family: 'Lora', serif; text-align: center; color: #e0e0e0; font-size: 22px; margin-bottom: 20px;">Symulacja Raty Miesięcznej</h3>
+        <div class="simulation-table-wrapper">
+            <table id="resultsTable">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <button class="pdf-button" id="pdfButton" onclick="generatePDF()">Generuj Ofertę jako PDF</button>
+        <button class="export-button" id="exportButton" onclick="generateWordDoc()">Eksportuj do Word (.doc)</button>
     </div>
 </div>
 
 <script>
-    // Cały skrypt pozostaje bez zmian
     const formatCurrency = (value) => {
         if (!value || isNaN(value)) return "-";
         return value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
@@ -289,7 +283,7 @@
             const yearText = getPolishYearForm(year);
             html += `
                 <div>
-                    <input type="checkbox" id="year_${year}" value="${year}">
+                    <input type="checkbox" id="year_${year}" value="${year}" checked>
                     <label for="year_${year}">${year} ${yearText}</label>
                 </div>
             `;
@@ -298,6 +292,7 @@
     }
 
     function generujSymulacje() {
+        // Ta funkcja pozostaje bez zmian
         const rocznaStopa = parseFloat(document.getElementById('oprocentowanie').value) || 0;
         const prowizjaProc = parseFloat(document.getElementById('prowizja').value) || 0;
         const resultsContainer = document.getElementById('resultsContainer');
@@ -358,28 +353,42 @@
         resultsContainer.style.display = 'block';
     }
     
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const captureArea = document.getElementById('captureArea');
-        const pdfButton = document.getElementById('pdfButton');
+    // --- NOWA FUNKCJA DO GENEROWANIA PLIKU WORD (.doc) ---
+    function generateWordDoc() {
+        if (document.querySelector("#resultsTable tbody").rows.length === 0) {
+            alert("Brak danych do wygenerowania pliku. Najpierw wygeneruj symulację.");
+            return;
+        }
         
-        pdfButton.style.display = 'none';
+        // Tworzenie kodu HTML, który zostanie umieszczony w pliku
+        // Dodajemy podstawowe style, aby tabela dobrze wyglądała w Wordzie
+        let header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+            "xmlns='http://www.w3.org/TR/REC-html40'>"+
+            "<head><meta charset='utf-8'><title>Symulacja Kredytowa</title></head><body>";
         
-        html2canvas(captureArea, {
-            backgroundColor: '#3a3a3a',
-            scale: 2 
-        }).then(canvas => {
-            pdfButton.style.display = 'block';
+        let footer = "</body></html>";
+        
+        const oprocentowanie = document.getElementById('oprocentowanie').value;
+        const prowizja = document.getElementById('prowizja').value;
+        const tableHTML = document.getElementById("resultsTable").outerHTML;
 
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'px',
-                format: [canvas.width + 40, canvas.height + 40] // Dodaj marginesy
-            });
-            pdf.addImage(imgData, 'PNG', 20, 20, canvas.width, canvas.height); // Dodaj marginesy
-            pdf.save("symulacja_kredytowa.pdf");
-        });
+        // Budowanie całej zawartości pliku
+        let sourceHTML = header +
+            `<h1>Symulacja Raty Miesięcznej</h1>` +
+            `<p>Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>` +
+            tableHTML +
+            `<br><p><i>Dokument ma charakter informacyjny.</i></p>` +
+            footer;
+
+        // Tworzenie pliku do pobrania
+        let source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+        let fileDownload = document.createElement("a");
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'symulacja_kredytowa.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
     }
 
     document.addEventListener('DOMContentLoaded', initializeCheckboxes);
