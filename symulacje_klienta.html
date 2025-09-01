@@ -246,6 +246,10 @@
 </div>
 
 <script>
+    // Wszystkie funkcje pomocnicze (formatCurrency, getPolishYearForm, addAmountInput, etc.)
+    // i funkcja generujSymulacje() pozostają bez zmian.
+    // Poniżej znajduje się tylko zaktualizowana funkcja generateWordDoc().
+    
     const formatCurrency = (value) => {
         if (!value || isNaN(value)) return "-";
         return value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
@@ -352,31 +356,34 @@
         resultsContainer.style.display = 'block';
     }
     
+    // --- ZAKTUALIZOWANA FUNKCJA GENEROWANIA PLIKU .DOC Z CIEMNYM MOTYWEM ---
     function generateWordDoc() {
         if (document.querySelector("#resultsTable tbody").rows.length === 0) {
             alert("Brak danych do wygenerowania pliku. Najpierw wygeneruj symulację.");
             return;
         }
 
-        // --- NOWA, ZNACZNIE ULEPSZONA FUNKCJA GENEROWANIA PLIKU .DOC ---
-        
-        // 1. Zdefiniowanie stylów CSS dla dokumentu Worda
+        // 1. Zdefiniowanie stylów CSS dla ciemnego motywu w Wordzie
         const styles = `
             <style>
                 body {
-                    font-family: 'Segoe UI', 'Calibri', Arial, sans-serif;
+                    background-color: #2b2b2b;
+                    font-family: Calibri, Arial, sans-serif;
                     font-size: 11pt;
+                    color: #e0e0e0;
+                }
+                .WordSection1 {
                     margin: 1in;
                 }
                 h1 {
                     font-size: 18pt;
-                    color: #2F5496;
+                    color: #009688; /* Kolor akcentu - Teal */
                     text-align: center;
                     margin-bottom: 12pt;
                 }
-                p {
+                p.subtitle {
                     font-size: 10pt;
-                    color: #595959;
+                    color: #bbbbbb;
                     text-align: center;
                     margin-bottom: 24pt;
                 }
@@ -385,36 +392,60 @@
                     border-collapse: collapse;
                 }
                 th, td {
-                    border: 1px solid #BFBFBF;
+                    border: 1px solid #555555;
                     padding: 8px;
                     text-align: right;
                 }
                 th {
-                    background-color: #4472C4;
-                    color: #FFFFFF;
+                    background-color: #3a3a3a;
+                    color: #e0e0e0;
                     font-weight: bold;
                     text-align: center;
                 }
                 td.amount-header {
                     text-align: left;
                     font-weight: bold;
-                    background-color: #F2F2F2;
+                    background-color: #424242;
+                }
+                td.result-cell {
+                    color: #81c784; /* Zielony dla rat */
+                    font-weight: bold;
                 }
                 .footer {
                     font-size: 8pt;
-                    color: #7F7F7F;
+                    color: #888888;
                     text-align: center;
                     margin-top: 40pt;
+                    border-top: 1px solid #555555;
+                    padding-top: 10pt;
                 }
             </style>
         `;
 
-        // 2. Pobranie danych i zbudowanie struktury HTML
+        // 2. Pobranie danych i przygotowanie tabeli HTML ze stylami inline
         const oprocentowanie = document.getElementById('oprocentowanie').value;
         const prowizja = document.getElementById('prowizja').value;
-        const tableHTML = document.getElementById("resultsTable").outerHTML;
         const currentDate = new Date().toLocaleDateString('pl-PL');
+        
+        // Klonujemy tabelę, aby dodać do niej style inline bez modyfikowania widoku na stronie
+        const tableForWord = document.getElementById("resultsTable").cloneNode(true);
+        
+        tableForWord.querySelectorAll('th').forEach(th => {
+            th.setAttribute('style', 'background-color:#3a3a3a; color:#e0e0e0; font-weight:bold; text-align:center; border:1px solid #555; padding:8px;');
+        });
 
+        tableForWord.querySelectorAll('tbody tr').forEach(row => {
+            row.querySelectorAll('td').forEach((cell, cellIndex) => {
+                if (cellIndex === 0) {
+                    cell.setAttribute('style', 'text-align:left; font-weight:bold; background-color:#424242; border:1px solid #555; padding:8px;');
+                } else {
+                    cell.setAttribute('style', 'color:#81c784; font-weight:bold; text-align:right; border:1px solid #555; padding:8px;');
+                }
+            });
+        });
+
+
+        // 3. Zbudowanie finalnego kodu HTML dla pliku .doc
         let sourceHTML = `
             <!DOCTYPE html>
             <html lang="pl">
@@ -424,57 +455,11 @@
                 ${styles}
             </head>
             <body>
-                <h1>Symulacja Raty Miesięcznej</h1>
-                <p>Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>
-                ${tableHTML}
-                <div class="footer">
-                    <p>Wygenerowano: ${currentDate}</p>
-                    <p><i>Dokument ma charakter wyłącznie informacyjny i nie stanowi oferty w rozumieniu Kodeksu Cywilnego.</i></p>
-                </div>
-            </body>
-            </html>
-        `;
-
-        // 3. Konwersja formatowania komórek z webowego na Wordowy
-        // Niestety, Word nie rozumie klas CSS, więc musimy wstrzyknąć style bezpośrednio
-        const originalTable = document.getElementById("resultsTable");
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = originalTable.outerHTML;
-        const tableForWord = tempDiv.querySelector('table');
-        
-        tableForWord.querySelectorAll('th').forEach(th => {
-            th.style.backgroundColor = '#4472C4';
-            th.style.color = '#FFFFFF';
-            th.style.fontWeight = 'bold';
-            th.style.textAlign = 'center';
-            th.style.border = '1px solid #BFBFBF';
-            th.style.padding = '8px';
-        });
-
-        tableForWord.querySelectorAll('tbody tr').forEach((row, index) => {
-            row.querySelectorAll('td').forEach((cell, cellIndex) => {
-                cell.style.border = '1px solid #BFBFBF';
-                cell.style.padding = '8px';
-                if (cellIndex === 0) { // Pierwsza kolumna
-                    cell.style.textAlign = 'left';
-                    cell.style.fontWeight = 'bold';
-                    cell.style.backgroundColor = '#F2F2F2';
-                } else {
-                    cell.style.textAlign = 'right';
-                }
-            });
-        });
-
-        sourceHTML = `
-            <!DOCTYPE html>
-            <html lang="pl">
-            <head><meta charset='utf-8'><title>Symulacja Kredytowa</title></head>
-            <body>
-                <div style="font-family: Calibri, Arial, sans-serif; font-size: 11pt;">
-                    <h1 style="font-size: 18pt; color: #2F5496; text-align: center;">Symulacja Raty Miesięcznej</h1>
-                    <p style="font-size: 10pt; color: #595959; text-align: center;">Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>
+                <div class="WordSection1">
+                    <h1>Symulacja Raty Miesięcznej</h1>
+                    <p class="subtitle">Przygotowano dla oprocentowania ${oprocentowanie}% i prowizji ${prowizja}%</p>
                     ${tableForWord.outerHTML}
-                    <div style="font-size: 8pt; color: #7F7F7F; text-align: center; margin-top: 40pt;">
+                    <div class="footer">
                         <p>Wygenerowano: ${currentDate}</p>
                         <p><i>Dokument ma charakter wyłącznie informacyjny i nie stanowi oferty w rozumieniu Kodeksu Cywilnego.</i></p>
                     </div>
@@ -483,13 +468,12 @@
             </html>
         `;
 
-
         // 4. Utworzenie i pobranie pliku
         const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
         const fileDownload = document.createElement("a");
         document.body.appendChild(fileDownload);
         fileDownload.href = source;
-        fileDownload.download = `symulacja_${currentDate}.doc`;
+        fileDownload.download = `symulacja_kredytowa_${currentDate.replace(/\./g, '-')}.doc`;
         fileDownload.click();
         document.body.removeChild(fileDownload);
     }
