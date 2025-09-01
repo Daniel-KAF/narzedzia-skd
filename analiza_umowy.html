@@ -40,6 +40,14 @@
                         <label for="agreementDate" class="block text-sm font-medium text-gray-300 mb-1">Data zawarcia umowy</label>
                         <input type="date" id="agreementDate" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500" style="color-scheme: dark;">
                     </div>
+                    <div>
+                        <label for="analysisDate" class="block text-sm font-medium text-gray-300 mb-1">Data analizy</label>
+                        <input type="date" id="analysisDate" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500" style="color-scheme: dark;">
+                    </div>
+                    <div>
+                        <label for="advisorName" class="block text-sm font-medium text-gray-300 mb-1">Doradca</label>
+                        <input type="text" id="advisorName" class="w-full bg-gray-700 border border-gray-600 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500" placeholder="Imię i nazwisko doradcy">
+                    </div>
                 </div>
             </div>
 
@@ -72,6 +80,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Ustawienie domyślnej daty analizy na dzisiaj
+            document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
+
             const flawsData = [
                 { id: 'maxCostsExceeded', identifiers: ['36a'], label: 'Przekroczenie maksymalnych pozaodsetkowych kosztów kredytu', title: 'Naruszenie w zakresie maksymalnych pozaodsetkowych kosztów kredytu', legalBasis: 'Art. 36a ustawy o kredycie konsumenckim.', explanation: 'Zidentyfikowano, że suma kosztów pozaodsetkowych (takich jak prowizja, opłaty administracyjne, koszty ubezpieczeń) nałożonych na Kredytobiorcę przekracza ustawowy limit. Celem tego przepisu jest ochrona konsumenta przed lichwą i ukrywaniem realnego kosztu kredytu. Obciążenie kredytobiorcy kosztami przewyższającymi ustawowy limit jest rażącym naruszeniem prawa i stanowi jedną z najczęstszych podstaw do zastosowania sankcji kredytu darmowego.' },
                 { id: 'incorrectTotalAmount', identifiers: ['5.7', '30.1.2'], label: 'Nieprawidłowe zdefiniowanie całkowitej kwoty kredytu (kredytowanie kosztów)', title: 'Nieprawidłowe określenie całkowitej kwoty kredytu', legalBasis: 'Art. 5 pkt 7 oraz art. 30 ust. 1 pkt 2 ustawy o kredycie konsumenckim.', explanation: 'W umowie do "całkowitej kwoty kredytu" wliczono koszty takie jak prowizja czy składka ubezpieczeniowa, które zostały potrącone przez bank z góry i nigdy nie zostały fizycznie udostępnione Kredytobiorcy. Taka praktyka sztucznie zawyża kwotę kredytu, co wprowadza konsumenta w błąd, prowadzi do nieprawidłowego naliczenia odsetek (które są liczone od wyższej podstawy) oraz do błędnego wyliczenia wskaźnika RRSO.' },
@@ -142,8 +153,6 @@
             addViolationRow();
             
             document.getElementById('generate-btn').addEventListener('click', () => {
-                // --- NOWA, BARDZIEJ NIEZAWODNA LOGIKA ---
-                // 1. Otwórz puste okno natychmiast po kliknięciu
                 const newWindow = window.open('', '_blank');
                 if (!newWindow) {
                     alert('Wygląda na to, że Twoja przeglądarka zablokowała wyskakujące okienko. Proszę zezwolić na otwieranie okienek dla tej strony.');
@@ -156,6 +165,8 @@
                     lenderName: document.getElementById('lenderName').value || '[Nazwa banku]',
                     agreementNumber: document.getElementById('agreementNumber').value || '[Numer umowy]',
                     agreementDate: document.getElementById('agreementDate').value,
+                    analysisDate: document.getElementById('analysisDate').value, // Pobranie nowej daty
+                    advisorName: document.getElementById('advisorName').value || '[Imię i nazwisko doradcy]', // Pobranie doradcy
                     violations: []
                 };
                 
@@ -176,9 +187,17 @@
                 });
 
                 if (reportData.violations.length === 0) {
-                      newWindow.close(); // Zamknij puste okno, jeśli są błędy
+                      newWindow.close();
                       const btn = document.getElementById('generate-btn');
-                      // ... (reszta logiki błędu)
+                      const originalText = btn.innerText;
+                      btn.innerText = 'Wprowadź poprawne artykuły!';
+                      btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                      btn.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                      setTimeout(() => {
+                          btn.innerText = originalText;
+                          btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                          btn.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-teal-400', 'hover:from-blue-600', 'hover:to-teal-500');
+                      }, 2000);
                       return;
                 }
                 
@@ -188,12 +207,10 @@
                 const baseURL = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1) + 'raport.html';
                 const finalUrl = `${baseURL}?${params.toString()}`;
                 
-                // 2. Wprowadź link do pola na stronie głównej
                 document.getElementById('generated-link').value = finalUrl;
                 document.getElementById('link-container').classList.remove('hidden');
                 document.getElementById('link-container').scrollIntoView({ behavior: 'smooth' });
 
-                // 3. Przekieruj wcześniej otwarte okno do właściwego adresu
                 newWindow.location.href = finalUrl;
             });
 
