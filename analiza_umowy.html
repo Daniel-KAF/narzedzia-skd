@@ -180,12 +180,10 @@
                       return;
                 }
                 
-                // Niezawodna metoda przekazywania danych za pomocą parametrów URL
                 const params = new URLSearchParams();
-                // Konwertujemy cały obiekt `reportData` do tekstu JSON i przekazujemy jako jeden parametr
                 params.set('data', JSON.stringify(reportData));
                 
-                // Budujemy pełny adres URL do pliku raportu
+                // --- KLUCZOWA POPRAWKA: Budowanie pełnego adresu URL ---
                 const baseURL = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1) + 'raport.html';
                 const finalUrl = `${baseURL}?${params.toString()}`;
                 
