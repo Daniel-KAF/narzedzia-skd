@@ -22,60 +22,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- ZAKTUALIZOWANY I UPROSZCZONY SKRYPT ODCZYTU DANYCH ---
+            const params = new URLSearchParams(window.location.search);
             const reportView = document.getElementById('report-view');
             
-            const buildReportHtml = (reportData) => {
-                let { clientName, lenderName, agreementNumber, agreementDate, violations } = reportData;
-                agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
+            const clientName = params.get('clientName') || '[Imię i nazwisko Klienta]';
+            const lenderName = params.get('lenderName') || '[Nazwa banku]';
+            const agreementNumber = params.get('agreementNumber') || '[Numer umowy]';
+            let agreementDate = params.get('agreementDate');
+            agreementDate = agreementDate ? new Date(agreementDate).toLocaleDateString('pl-PL') : '[Data zawarcia umowy]';
 
-                let reportHTML = `
-                    <h3 style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 2rem; color: white;">WSTĘPNA ANALIZA PRAWNA UMOWY KREDYTOWEJ NR ${agreementNumber}</h3>
-                    <p><strong>Data sporządzenia:</strong> ${new Date().toLocaleDateString('pl-PL')}</p>
-                    <p><strong>Dotyczy:</strong> Umowy o kredyt konsumencki z dnia ${agreementDate} zawartej pomiędzy ${clientName} a ${lenderName}.</p>
-                    <br>
-                    <p>Szanowni Państwo,</p>
-                    <p>w odpowiedzi na Państwa prośbę, poniżej przedstawiamy zestawienie zidentyfikowanych uchybień, które mogą stanowić podstawę do skorzystania z <strong>sankcji kredytu darmowego</strong> na mocy art. 45 ustawy o kredycie konsumenckim.</p>
-                    <br>
-                    <h3 style="font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; color: white;">ZIDENTYFIKOWANE NARUSZENIA W UMOWIE:</h3>`;
-                
-                if (violations && violations.length > 0) {
-                    violations.forEach((violation, index) => {
-                        reportHTML += `
-                            <h3>${index + 1}. ${violation.title}</h3>
-                            <ul>
-                                <li><strong>Zarzut:</strong> ${violation.label}.</li>
-                                <li><strong>Naruszone przepisy Ustawy:</strong> ${violation.article}</li>
-                                <li><strong>Podstawa prawna do sankcji:</strong> ${violation.legalBasis}</li>
-                                <li><strong>Wyjaśnienie abuzywności:</strong> ${violation.explanation}</li>
-                            </ul>`;
-                    });
-                } else {
-                    reportHTML += `<p>Nie wprowadzono żadnych naruszeń.</p>`;
-                }
+            // Pobieramy wszystkie naruszenia
+            const violations = params.getAll('violation');
 
-                reportHTML += `
-                    <br>
-                    <p>Powyższe naruszenia dają podstawy do podjęcia działań prawnych. Rekomendujemy dalsze kroki w tej sprawie.</p>
-                    <p>Z poważaniem,<br>[Twoja Nazwa Firmy]</p>`;
-
-                return reportHTML;
-            };
-
-            const hash = window.location.hash;
-            if (hash && hash.startsWith('#data=')) {
-                try {
-                    const base64Data = decodeURIComponent(hash.substring(6));
-                    // --- POPRAWIONA SEKCJA DEKODOWANIA ---
-                    const jsonData = decodeURIComponent(escape(window.atob(base64Data)));
-                    const reportData = JSON.parse(jsonData);
-                    reportView.innerHTML = buildReportHtml(reportData);
-                } catch (e) {
-                    console.error("Błąd podczas dekodowania danych z URL:", e);
-                    reportView.innerHTML = '<p style="color: red;">Wystąpił błąd podczas odczytywania danych z linku. Proszę sprawdzić, czy link jest kompletny.</p>';
-                }
+            let reportHTML = `
+                <h3 style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 2rem; color: white;">WSTĘPNA ANALIZA PRAWNA UMOWY KREDYTOWEJ NR ${agreementNumber}</h3>
+                <p><strong>Data sporządzenia:</strong> ${new Date().toLocaleDateString('pl-PL')}</p>
+                <p><strong>Dotyczy:</strong> Umowy o kredyt konsumencki z dnia ${agreementDate} zawartej pomiędzy ${clientName} a ${lenderName}.</p>
+                <br>
+                <p>Szanowni Państwo,</p>
+                <p>w odpowiedzi na Państwa prośbę, poniżej przedstawiamy zestawienie zidentyfikowanych uchybień, które mogą stanowić podstawę do skorzystania z <strong>sankcji kredytu darmowego</strong> na mocy art. 45 ustawy o kredycie konsumenckim.</p>
+                <br>
+                <h3 style="font-weight: bold; font-size: 1.2rem; margin-bottom: 1rem; color: white;">ZIDENTYFIKOWANE NARUSZENIA W UMOWIE:</h3>`;
+            
+            if (violations.length > 0) {
+                violations.forEach((violation, index) => {
+                    // Wstawiamy tekst bezpośrednio z linku
+                    reportHTML += `
+                        <h3>Naruszenie ${index + 1}</h3>
+                        <p>${violation.replace(/\n/g, '<br>')}</p>`; // Zamieniamy nowe linie na <br> dla formatowania
+                });
             } else {
-                 reportView.innerHTML = '<p>Brak danych do wyświetlenia. Proszę wygenerować link w narzędziu "Analiza Umowy".</p>';
+                reportHTML += `<p>Nie wprowadzono żadnych naruszeń.</p>`;
             }
+
+            reportHTML += `
+                <br>
+                <p>Powyższe naruszenia dają podstawy do podjęcia działań prawnych. Rekomendujemy dalsze kroki w tej sprawie.</p>
+                <p>Z poważaniem,<br>[Twoja Nazwa Firmy]</p>`;
+
+            reportView.innerHTML = reportHTML;
         });
     </script>
 </body>
