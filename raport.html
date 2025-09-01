@@ -65,7 +65,7 @@
             if (hash && hash.startsWith('#data=')) {
                 try {
                     const base64Data = decodeURIComponent(hash.substring(6));
-                    // Poprawne dekodowanie polskich znaków
+                    // --- POPRAWIONA SEKCJA DEKODOWANIA ---
                     const jsonData = decodeURIComponent(escape(window.atob(base64Data)));
                     const reportData = JSON.parse(jsonData);
                     reportView.innerHTML = buildReportHtml(reportData);
