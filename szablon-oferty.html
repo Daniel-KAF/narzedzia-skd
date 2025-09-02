@@ -13,6 +13,16 @@
         body { font-family: 'Inter', sans-serif; }
         .control-btn.active { background-color: #FFC107; color: #0A192F; }
         .chart-container { position: relative; height: 250px; width: 100%; max-width: 500px; margin: auto; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table td { padding: 12px 8px; border-bottom: 1px solid #374151; }
+        .summary-table tr:last-child td { border-bottom: none; }
+        .summary-table .label { color: #d1d5db; }
+        .summary-table .amount { text-align: right; font-weight: 700; white-space: nowrap; }
+        .summary-table .green-text { color: #34d399; }
+        .summary-table .red-text { color: #ef4444; }
+        .summary-table .total-row td { border-top: 2px solid #FFC107; padding-top: 15px; font-size: 1.25rem; font-weight: 900; }
+        .summary-table .total-row .label { color: white; }
+        .summary-table .total-row .amount { color: #FFC107; }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -25,44 +35,39 @@
 
         <section id="summary-panel" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
             <h3 class="text-2xl font-bold text-center text-white mb-4">Proszę wybrać czas trwania procesu:</h3>
-            <div class="flex justify-center border border-gray-700 rounded-lg p-1 bg-[#0A192F] max-w-sm mx-auto mb-6">
+            <div class="flex justify-center border border-gray-700 rounded-lg p-1 bg-[#0A192F] max-w-sm mx-auto mb-8">
                 <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition active" data-duration="1">Proces 1 rok</button>
                 <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition" data-duration="2">Proces 2 lata</button>
             </div>
 
-            <div class="text-center">
-                <p class="text-lg text-gray-400">Przewidywany czysty zysk:</p>
-                <h2 class="text-6xl md:text-7xl font-black text-[#FFC107] my-3 [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="net-profit-val"></span></h2>
-                <div class="flex justify-center gap-6 text-center mt-4">
-                    <div>
-                        <p class="text-gray-400">Suma korzyści</p>
-                        <p class="font-bold text-green-400 text-xl"><span id="total-benefit-val"></span></p>
-                    </div>
-                    <div>
-                        <p class="text-gray-400">Całkowita inwestycja</p>
-                        <p class="font-bold text-red-400 text-xl"><span id="total-investment-val"></span></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="key-numbers" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-center">
-            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
-                <p class="text-gray-400">Główny zwrot (WPS)</p>
-                <p class="text-2xl font-bold text-white"><span id="wps-val"></span></p>
-            </div>
-            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
-                <p class="text-gray-400">Oszczędność na ratach</p>
-                <p class="text-2xl font-bold text-white"><span id="savings-val"></span></p>
-            </div>
-            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
-                <p class="text-gray-400">Opłata wstępna</p>
-                <p class="text-2xl font-bold text-white"><span id="upfront-fee-val"></span></p>
-            </div>
+            <table class="summary-table max-w-2xl mx-auto">
+                <tbody>
+                    <tr>
+                        <td class="label">Zwrot na konto (WPS + Odsetki)</td>
+                        <td class="amount green-text" id="calc-return"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Dodatkowa korzyść (Oszczędność na ratach)</td>
+                        <td class="amount green-text" id="calc-savings"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Success Fee Kancelarii (prowizja od sukcesu)</td>
+                        <td class="amount red-text" id="calc-success-fee"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Koszty na start (Opłata wstępna)</td>
+                        <td class="amount red-text" id="calc-upfront-fee"></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="label">ZYSK NA CZYSTO</td>
+                        <td class="amount" id="calc-net-profit"></td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
         <section id="chart-section" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
-            <h3 class="text-2xl font-bold text-center text-white mb-4">Inwestycja vs. Potencjalny Zysk</h3>
+            <h3 class="text-2xl font-bold text-center text-white mb-4">Inwestycja na start vs. Zysk na czysto</h3>
             <div class="chart-container"><canvas id="investmentVsProfitChart"></canvas></div>
         </section>
         
@@ -92,49 +97,59 @@
             const ctx = document.getElementById('investmentVsProfitChart').getContext('2d');
             investmentChart = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: ['Inwestycja', 'Potencjalna Korzyść'], datasets: [{ data: [], backgroundColor: ['#E03616', '#64FFDA'], borderWidth: 1, borderRadius: 5 }] },
+                data: { labels: ['Inwestycja na start', 'Zysk na czysto'], datasets: [{ data: [], backgroundColor: ['#ef4444', '#34d399'], borderWidth: 1, borderRadius: 5 }] },
                 options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { ticks: { color: '#CCD6F6' } }, y: { ticks: { color: '#CCD6F6' } } }, plugins: { legend: { display: false } } }
             });
         }
 
         function updateDisplay() {
             const params = new URLSearchParams(window.location.search);
-            const wps = parseFloat(params.get('wps'));
-            const savings = parseFloat(params.get('savings'));
-            const upfrontFee = parseFloat(params.get('upfrontFee'));
-            const successFeePerc = parseFloat(params.get('successFee'));
+            const wps = parseFloat(params.get('wps')) || 0;
+            const savings = parseFloat(params.get('savings')) || 0; // Oszczędność na ratach
+            const upfrontFee = parseFloat(params.get('upfrontFee')) || 0; // Zbiorcza opłata wstępna
+            const successFeePerc = parseFloat(params.get('successFee')) / 100 || 0; // Procent dla kancelarii
+
+            // Stałe i założenia z kalkulatora
+            const annualInterestRate = 0.105; // Roczne oprocentowanie odsetek
             
-            // ZMIANA: Całkowicie usunięto logikę 'gender'
+            // Obliczenia dla 1 roku i 2 lat
+            const interest1Y = wps * annualInterestRate;
+            const interest2Y = wps * annualInterestRate * 2;
+
+            const totalRecovered1Y = wps + interest1Y;
+            const totalRecovered2Y = wps + interest2Y;
+
+            const clientGrossProfit1Y = totalRecovered1Y + savings; // To jest "Suma korzyści"
+            const clientGrossProfit2Y = totalRecovered2Y + savings;
+
+            const successFeeAmount1Y = clientGrossProfit1Y * successFeePerc;
+            const successFeeAmount2Y = clientGrossProfit2Y * successFeePerc;
             
-            const interest1Y = wps * 0.105;
-            const interest2Y = wps * 0.105 * 2;
-            const fee2nd = 922.50;
+            // Końcowy zysk netto
+            const clientNetProfit1Y = clientGrossProfit1Y - successFeeAmount1Y - upfrontFee;
+            const clientNetProfit2Y = clientGrossProfit2Y - successFeeAmount2Y - upfrontFee;
 
-            const totalBenefit1Y = wps + savings + interest1Y;
-            const successFeeAmount1Y = totalBenefit1Y * (successFeePerc / 100);
-            const totalInvestment1Y = upfrontFee + fee2nd + successFeeAmount1Y;
-            const netProfit1Y = totalBenefit1Y - totalInvestment1Y;
-
-            const totalBenefit2Y = wps + savings + interest2Y;
-            const successFeeAmount2Y = totalBenefit2Y * (successFeePerc / 100);
-            const totalInvestment2Y = upfrontFee + fee2nd + successFeeAmount2Y;
-            const netProfit2Y = totalBenefit2Y - totalInvestment2Y;
-
+            // Update display based on currentDuration
             const isOneYear = currentDuration === '1';
-            document.getElementById('net-profit-val').textContent = formatCurrency(isOneYear ? netProfit1Y : netProfit2Y);
-            document.getElementById('total-benefit-val').textContent = formatCurrency(isOneYear ? totalBenefit1Y : totalBenefit2Y);
-            document.getElementById('total-investment-val').textContent = formatCurrency(isOneYear ? totalInvestment1Y : totalInvestment2Y);
+            const netProfit = isOneYear ? clientNetProfit1Y : clientNetProfit2Y;
+            const totalRecovered = isOneYear ? totalRecovered1Y : totalRecovered2Y;
+            const successFeeAmount = isOneYear ? successFeeAmount1Y : successFeeAmount2Y;
+            
+            // Aktualizacja nowej tabeli
+            document.getElementById('calc-return').textContent = "+ " + formatCurrency(totalRecovered);
+            document.getElementById('calc-savings').textContent = "+ " + formatCurrency(savings);
+            document.getElementById('calc-success-fee').textContent = "- " + formatCurrency(successFeeAmount);
+            document.getElementById('calc-upfront-fee').textContent = "- " + formatCurrency(upfrontFee);
+            document.getElementById('calc-net-profit').textContent = formatCurrency(netProfit);
 
-            document.getElementById('wps-val').textContent = formatCurrency(wps);
-            document.getElementById('savings-val').textContent = formatCurrency(savings);
-            document.getElementById('upfront-fee-val').textContent = formatCurrency(upfrontFee);
-
+            // Aktualizacja sekcji ratalnej
             document.getElementById('upfront-fee-val-installments').textContent = formatCurrency(upfrontFee);
             document.getElementById('installment-5').textContent = formatCurrency(upfrontFee / 5);
             document.getElementById('installment-10').textContent = formatCurrency(upfrontFee / 10);
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
             
-            investmentChart.data.datasets[0].data = [isOneYear ? totalInvestment1Y : totalInvestment2Y, isOneYear ? totalBenefit1Y : totalBenefit2Y];
+            // Aktualizacja wykresu
+            investmentChart.data.datasets[0].data = [upfrontFee, netProfit > 0 ? netProfit : 0];
             investmentChart.update();
         }
 
