@@ -11,296 +11,154 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .chart-container { position: relative; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
-        @media (min-width: 768px) { .chart-container { height: 350px; } }
-        .control-btn.active { background-color: #FFC107; color: #0A192F; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .table-content { display: none; }
-        .table-content.active { display: block; }
+        .control-btn.active { background-color: #FFC107; color: #0A192F; }
+        .chart-container { position: relative; height: 250px; width: 100%; max-width: 500px; margin: auto; }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
 
-    <div id="offer-content" class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-black text-white mb-2">Propozycja współpracy w ramach SKD</h1>
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-black text-white">Propozycja współpracy w ramach SKD</h1>
+            <p class="text-lg text-gray-400 mt-2">Przygotowana symulacja korzyści finansowych</p>
         </header>
 
-        <section id="opportunity" class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-[#112240] rounded-lg shadow-lg p-8 text-center border border-gray-700">
-                <p class="text-xl text-gray-400 mb-2">Główna kwota do odzyskania (WPS)</p>
-                <h2 class="text-5xl md:text-7xl font-black text-[#FFC107] [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="wps-val"></span></h2>
-                <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">To "żywe pieniądze", które bank powinien <span class="gender-text"></span> zwrócić.</p>
+        <section id="summary-panel" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
+            <h3 class="text-2xl font-bold text-center text-white mb-4">Proszę wybrać czas trwania procesu:</h3>
+            <div class="flex justify-center border border-gray-700 rounded-lg p-1 bg-[#0A192F] max-w-sm mx-auto mb-6">
+                <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition active" data-duration="1">Proces 1 rok</button>
+                <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition" data-duration="2">Proces 2 lata</button>
             </div>
-            <div class="bg-[#112240] rounded-lg shadow-lg p-8 text-center border border-gray-700">
-                <p class="text-xl text-gray-400 mb-2">Oszczędność na przyszłych ratach</p>
-                <h2 class="text-5xl md:text-7xl font-black text-[#FFC107] [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="savings-val"></span></h2>
-                <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">To kwota odsetek, których nie będzie <span class="gender-text"></span> musiała płacić do końca umowy.</p>
-            </div>
-        </section>
 
-        <section id="process" class="mb-12">
-            <h3 class="text-3xl font-bold text-center text-white mb-12">Proces do odzyskania pieniędzy w 4 krokach</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-                <div class="flex flex-col items-center p-4">
-                    <div class="bg-[#112240] border-2 border-[#FFC107] text-white w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-lg"><span>✍️</span></div>
-                    <h4 class="font-bold text-lg mb-1 text-white">Krok 1: Umowa i opłata</h4>
-                    <p class="text-sm text-gray-400">Podpisuje <span class="gender-text"></span> umowę i inwestuje w start sprawy.</p>
-                </div>
-                <div class="flex flex-col items-center p-4">
-                    <div class="bg-[#112240] border-2 border-[#FFC107] text-white w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-lg"><span>⚖️</span></div>
-                    <h4 class="font-bold text-lg mb-1 text-white">Krok 2: Składamy pozew</h4>
-                    <p class="text-sm text-gray-400">Profesjonalnie reprezentujemy <span class="gender-text-dopelniacz"></span> w sądzie.</p>
-                </div>
-                <div class="flex flex-col items-center p-4">
-                    <div class="bg-[#112240] border-2 border-[#FFC107] text-white w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-lg"><span>🏆</span></div>
-                    <h4 class="font-bold text-lg mb-1 text-white">Krok 3: Wygrywamy sprawę</h4>
-                    <p class="text-sm text-gray-400">Doprowadzamy do korzystnego wyroku.</p>
-                </div>
-                <div class="flex flex-col items-center p-4">
-                    <div class="bg-[#FFC107] text-[#0A192F] w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-lg"><span>💰</span></div>
-                    <h4 class="font-bold text-lg mb-1 text-white">Krok 4: Otrzymuje <span class="gender-text"></span> pieniądze</h4>
-                    <p class="text-sm text-gray-400">Środki trafiają na <span class="gender-text-celownik"></span> konto.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="financials" class="mb-12">
-            <h3 class="text-3xl font-bold text-center text-white mb-8">Liczby mówią same za siebie</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-[#112240] rounded-lg shadow-md p-6 border border-gray-700">
-                    <h4 class="text-xl font-bold text-center mb-4 text-white">Składniki korzyści dla <span class="gender-text-dopelniacz"></span></h4>
-                    <p class="text-center text-gray-400 text-sm mb-4">Na <span class="gender-text-celownik"></span> całkowity zysk składają się trzy elementy.</p>
-                    <div class="chart-container"><canvas id="benefitCompositionChart"></canvas></div>
-                </div>
-                <div class="bg-[#112240] rounded-lg shadow-md p-6 border border-gray-700">
-                    <h4 class="text-xl font-bold text-center mb-4 text-white">Inwestycja vs. potencjalny zysk</h4>
-                     <p class="text-center text-gray-400 text-sm mb-4">Proszę zobaczyć, jak niewielka jest inwestycja w porównaniu do skali możliwych korzyści.</p>
-                    <div class="chart-container h-[350px] md:h-[400px]"><canvas id="investmentVsProfitChart"></canvas></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="summary" class="mb-12">
-            <div class="bg-[#112240] rounded-lg shadow-lg p-8 border border-gray-700">
-                <h3 class="text-3xl font-bold text-center text-white mb-2">Proszę wybrać opcję i zobaczyć <span class="gender-text-dopelniacz"></span> zysk</h3>
-                <p class="text-center text-gray-400 max-w-3xl mx-auto mb-6">Proszę dostosować symulację, wybierając czas trwania procesu sądowego.</p>
-                <div class="flex justify-center items-center gap-4 mb-8">
-                    <div class="flex justify-center border border-gray-700 rounded-lg p-1 bg-[#0A192F]">
-                        <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition active whitespace-nowrap" data-duration="1">Proces 1 rok</button>
-                        <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition whitespace-nowrap" data-duration="2">Proces 2 lata</button>
+            <div class="text-center">
+                <p class="text-lg text-gray-400">Przewidywany czysty zysk:</p>
+                <h2 class="text-6xl md:text-7xl font-black text-[#FFC107] my-3 [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="net-profit-val"></span></h2>
+                <div class="flex justify-center gap-6 text-center mt-4">
+                    <div>
+                        <p class="text-gray-400">Suma korzyści</p>
+                        <p class="font-bold text-green-400 text-xl"><span id="total-benefit-val"></span></p>
                     </div>
-                </div>
-                <div id="tables-container">
-                    <div id="table-1" class="table-content active">
-                        <p class="text-center text-lg text-gray-400 max-w-3xl mx-auto mb-6">Opłata wstępna: <span class="font-bold text-white" id="upfront-fee-val-1"></span> | Success Fee: <span class="font-bold text-white" id="success-fee-val-1"></span></p>
-                        <table class="w-full max-w-3xl mx-auto text-left border-collapse">
-                            <thead><tr class="border-b-2 border-[#FFC107]"><th class="p-4 text-lg font-bold text-white">Pozycja (1 rok)</th><th class="p-4 text-lg font-bold text-right text-white">Kwota</th></tr></thead>
-                            <tbody>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Zwrot kosztów (WPS)</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="wps-val-t1"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Oszczędność na przyszłych ratach</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="savings-val-t1"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Odsetki karne (1 rok)</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="interest-val-t1"></span></td></tr>
-                                <tr class="border-b-2 border-gray-600"><td class="p-4 font-bold text-white">SUMA KORZYŚCI</td><td class="p-4 font-bold text-green-400 text-right text-xl whitespace-nowrap"><span id="total-benefit-val-t1"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Opłata wstępna</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- <span id="upfront-fee-val-t1"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Opłata za II instancję (opcjonalnie)</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- 922,50 zł</td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Success Fee (<span id="success-fee-perc-t1"></span>)</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- <span id="success-fee-amount-t1"></span></td></tr>
-                                <tr class="bg-[#0A192F] rounded-b-lg"><td class="p-4 text-xl md:text-2xl font-black text-white">CZYSTY ZYSK DLA <span class="gender-text-dopelniacz-upper"></span></td><td class="p-4 text-xl md:text-2xl font-black text-[#FFC107] text-right [text-shadow:1px_1px_2px_rgba(0,0,0,0.4)] whitespace-nowrap"><span id="net-profit-val-t1"></span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="table-2" class="table-content">
-                        <p class="text-center text-lg text-gray-400 max-w-3xl mx-auto mb-6">Opłata wstępna: <span class="font-bold text-white" id="upfront-fee-val-2"></span> | Success Fee: <span class="font-bold text-white" id="success-fee-val-2"></span></p>
-                        <table class="w-full max-w-3xl mx-auto text-left border-collapse">
-                            <thead><tr class="border-b-2 border-[#FFC107]"><th class="p-4 text-lg font-bold text-white">Pozycja (2 lata)</th><th class="p-4 text-lg font-bold text-right text-white">Kwota</th></tr></thead>
-                            <tbody>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Zwrot kosztów (WPS)</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="wps-val-t2"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Oszczędność na przyszłych ratach</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="savings-val-t2"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Odsetki karne (2 lata)</td><td class="p-4 text-green-400 text-right whitespace-nowrap text-base sm:text-lg">+ <span id="interest-val-t2"></span></td></tr>
-                                <tr class="border-b-2 border-gray-600"><td class="p-4 font-bold text-white">SUMA KORZYŚCI</td><td class="p-4 font-bold text-green-400 text-right text-xl whitespace-nowrap"><span id="total-benefit-val-t2"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Opłata wstępna</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- <span id="upfront-fee-val-t2"></span></td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Opłata za II instancję (opcjonalnie)</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- 922,50 zł</td></tr>
-                                <tr class="border-b border-gray-700"><td class="p-4 text-gray-400">Success Fee (<span id="success-fee-perc-t2"></span>)</td><td class="p-4 text-red-400 text-right whitespace-nowrap text-base sm:text-lg">- <span id="success-fee-amount-t2"></span></td></tr>
-                                <tr class="bg-[#0A192F] rounded-b-lg"><td class="p-4 text-xl md:text-2xl font-black text-white">CZYSTY ZYSK DLA <span class="gender-text-dopelniacz-upper"></span></td><td class="p-4 text-xl md:text-2xl font-black text-[#FFC107] text-right [text-shadow:1px_1px_2px_rgba(0,0,0,0.4)] whitespace-nowrap"><span id="net-profit-val-t2"></span></td></tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <p class="text-gray-400">Całkowita inwestycja</p>
+                        <p class="font-bold text-red-400 text-xl"><span id="total-investment-val"></span></p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="installments" class="mb-12">
-            <div class="bg-[#112240] rounded-lg shadow-lg p-8 border border-gray-700">
-                <h3 class="text-3xl font-bold text-center text-white mb-2">Elastyczne finansowanie</h3>
-                <p class="text-center text-gray-400 max-w-3xl mx-auto mb-8">W razie potrzeby, opłatę wstępną możemy rozbić na poniższe opcje</p>
-                <div>
-                    <h4 class="text-2xl font-bold text-center text-white mb-2">Raty dla opłaty <span id="upfront-fee-val-installments"></span></h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                        <div class="border-2 border-gray-700 rounded-lg p-6 text-center">
-                            <h5 class="text-xl font-bold text-white">5 RAT 0%</h5>
-                            <p class="text-3xl md:text-4xl font-black text-[#FFC107] my-2 [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="installment-5"></span></p>
-                            <p class="text-gray-400">miesięcznie</p>
-                        </div>
-                        <div class="border-2 border-gray-700 rounded-lg p-6 text-center">
-                            <h5 class="text-xl font-bold text-white">10 RAT 0%</h5>
-                            <p class="text-3xl md:text-4xl font-black text-[#FFC107] my-2 [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="installment-10"></span></p>
-                            <p class="text-gray-400">miesięcznie</p>
-                        </div>
-                        <div class="border-2 border-gray-700 rounded-lg p-6 text-center">
-                            <h5 class="text-xl font-bold text-white">20 RAT 0%</h5>
-                            <p class="text-3xl md:text-4xl font-black text-[#FFC107] my-2 [text-shadow:2px_2px_4px_rgba(0,0,0,0.4)]"><span id="installment-20"></span></p>
-                            <p class="text-gray-400">miesięcznie</p>
-                        </div>
-                    </div>
-                </div>
+        <section id="key-numbers" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-center">
+            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
+                <p class="text-gray-400">Główny zwrot (WPS)</p>
+                <p class="text-2xl font-bold text-white"><span id="wps-val"></span></p>
             </div>
+            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
+                <p class="text-gray-400">Oszczędność na ratach</p>
+                <p class="text-2xl font-bold text-white"><span id="savings-val"></span></p>
+            </div>
+            <div class="bg-[#112240] rounded-lg p-4 border border-gray-700">
+                <p class="text-gray-400">Opłata wstępna</p>
+                <p class="text-2xl font-bold text-white"><span id="upfront-fee-val"></span></p>
+            </div>
+        </section>
+
+        <section id="chart-section" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
+            <h3 class="text-2xl font-bold text-center text-white mb-4">Inwestycja vs. Potencjalny Zysk</h3>
+            <div class="chart-container"><canvas id="investmentVsProfitChart"></canvas></div>
         </section>
         
-        <footer class="text-center py-8">
-             <p class="text-lg text-gray-400">W razie pytań jestem do dyspozycji</p>
+        <section id="installments" class="bg-[#112240] rounded-lg p-6 border border-gray-700 mb-8">
+             <h3 class="text-2xl font-bold text-center text-white mb-4">Elastyczne finansowanie</h3>
+             <p class="text-center text-gray-400 mb-4">Opłatę wstępną <span class="font-bold text-white" id="upfront-fee-val-installments"></span> można rozłożyć na raty 0%:</p>
+             <div class="flex justify-center gap-4 text-center">
+                <div class="flex-1"><p class="font-bold text-lg text-white">5x</p><p class="text-[#FFC107] font-semibold"><span id="installment-5"></span></p></div>
+                <div class="flex-1"><p class="font-bold text-lg text-white">10x</p><p class="text-[#FFC107] font-semibold"><span id="installment-10"></span></p></div>
+                <div class="flex-1"><p class="font-bold text-lg text-white">20x</p><p class="text-[#FFC107] font-semibold"><span id="installment-20"></span></p></div>
+             </div>
+        </section>
+
+        <footer class="text-center py-6">
+             <p class="text-lg text-gray-400">Proces w 4 krokach: ✍️ Umowa → ⚖️ Pozew → 🏆 Wygrana → 💰 Pieniądze na koncie!</p>
+             <p class="text-lg text-gray-400 mt-4">W razie pytań jestem do dyspozycji</p>
              <p class="text-xl font-bold text-white mt-2">Daniel Daniszewski 508 171 922</p>
         </footer>
-
     </div>
 
     <script>
-        const formatCurrency = (value) => value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
+        const formatCurrency = (value) => value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 2 });
+        let investmentChart;
+        let currentDuration = '1';
 
-        const chartTextColor = '#CCD6F6';
-        const chartGridColor = 'rgba(204, 214, 246, 0.2)';
-        let benefitChart, investmentChart;
-
-        function initializeCharts() {
-            const benefitCompositionCtx = document.getElementById('benefitCompositionChart').getContext('2d');
-            benefitChart = new Chart(benefitCompositionCtx, {
-                type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#64FFDA', '#FFC107', '#E03616'], borderColor: '#0A192F', borderWidth: 4, hoverOffset: 8 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { color: chartTextColor } } } }
-            });
-
-            const investmentVsProfitCtx = document.getElementById('investmentVsProfitChart').getContext('2d');
-            investmentChart = new Chart(investmentVsProfitCtx, {
-                type: 'bar', data: { labels: ['Inwestycja', 'Potencjalna Korzyść'], datasets: [{ data: [], backgroundColor: ['#E03616', '#64FFDA'], borderWidth: 1, borderRadius: 5 }] },
-                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { color: chartTextColor, callback: (v) => formatCurrency(v) }, grid: { color: chartGridColor } }, y: { ticks: { color: chartTextColor }, grid: { color: 'transparent' } } }, plugins: { legend: { display: false } } }
+        function initializeChart() {
+            const ctx = document.getElementById('investmentVsProfitChart').getContext('2d');
+            investmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['Inwestycja', 'Potencjalna Korzyść'], datasets: [{ data: [], backgroundColor: ['#E03616', '#64FFDA'], borderWidth: 1, borderRadius: 5 }] },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { ticks: { color: '#CCD6F6' } }, y: { ticks: { color: '#CCD6F6' } } }, plugins: { legend: { display: false } } }
             });
         }
 
-        let currentDuration = '1';
-        const durationButtons = document.querySelectorAll('.duration-btn');
-        const allTables = document.querySelectorAll('.table-content');
-        
-        function calculateAndDisplay(params) {
+        function updateDisplay() {
+            const params = new URLSearchParams(window.location.search);
             const wps = parseFloat(params.get('wps'));
             const savings = parseFloat(params.get('savings'));
             const upfrontFee = parseFloat(params.get('upfrontFee'));
             const successFeePerc = parseFloat(params.get('successFee'));
-            const gender = params.get('gender');
-
-            const genderForms = {
-                'Pani': { base: 'Pani', dopelniacz: 'Pani', celownik: 'Pani', dopelniaczUpper: 'PANI' },
-                'Pana': { base: 'Pan', dopelniacz: 'Pana', celownik: 'Panu', dopelniaczUpper: 'PANA' }
-            };
-            const selectedGender = genderForms[gender];
-
-            document.querySelectorAll('.gender-text').forEach(el => el.textContent = selectedGender.base);
-            document.querySelectorAll('.gender-text-dopelniacz').forEach(el => el.textContent = selectedGender.dopelniacz);
-            document.querySelectorAll('.gender-text-celownik').forEach(el => el.textContent = selectedGender.celownik);
-            document.querySelectorAll('.gender-text-dopelniacz-upper').forEach(el => el.textContent = selectedGender.dopelniaczUpper);
-
+            
+            // ZMIANA: Całkowicie usunięto logikę 'gender'
+            
             const interest1Y = wps * 0.105;
             const interest2Y = wps * 0.105 * 2;
             const fee2nd = 922.50;
 
             const totalBenefit1Y = wps + savings + interest1Y;
             const successFeeAmount1Y = totalBenefit1Y * (successFeePerc / 100);
-            const netProfit1Y = totalBenefit1Y - upfrontFee - fee2nd - successFeeAmount1Y;
+            const totalInvestment1Y = upfrontFee + fee2nd + successFeeAmount1Y;
+            const netProfit1Y = totalBenefit1Y - totalInvestment1Y;
 
             const totalBenefit2Y = wps + savings + interest2Y;
             const successFeeAmount2Y = totalBenefit2Y * (successFeePerc / 100);
-            const netProfit2Y = totalBenefit2Y - upfrontFee - fee2nd - successFeeAmount2Y;
+            const totalInvestment2Y = upfrontFee + fee2nd + successFeeAmount2Y;
+            const netProfit2Y = totalBenefit2Y - totalInvestment2Y;
+
+            const isOneYear = currentDuration === '1';
+            document.getElementById('net-profit-val').textContent = formatCurrency(isOneYear ? netProfit1Y : netProfit2Y);
+            document.getElementById('total-benefit-val').textContent = formatCurrency(isOneYear ? totalBenefit1Y : totalBenefit2Y);
+            document.getElementById('total-investment-val').textContent = formatCurrency(isOneYear ? totalInvestment1Y : totalInvestment2Y);
 
             document.getElementById('wps-val').textContent = formatCurrency(wps);
             document.getElementById('savings-val').textContent = formatCurrency(savings);
+            document.getElementById('upfront-fee-val').textContent = formatCurrency(upfrontFee);
 
-            // Table 1 Year
-            document.getElementById('upfront-fee-val-1').textContent = formatCurrency(upfrontFee);
-            document.getElementById('success-fee-val-1').textContent = `${successFeePerc}%`;
-            document.getElementById('wps-val-t1').textContent = formatCurrency(wps);
-            document.getElementById('savings-val-t1').textContent = formatCurrency(savings);
-            document.getElementById('interest-val-t1').textContent = formatCurrency(interest1Y);
-            document.getElementById('total-benefit-val-t1').textContent = formatCurrency(totalBenefit1Y);
-            document.getElementById('upfront-fee-val-t1').textContent = formatCurrency(upfrontFee);
-            document.getElementById('success-fee-perc-t1').textContent = `${successFeePerc}%`;
-            document.getElementById('success-fee-amount-t1').textContent = formatCurrency(successFeeAmount1Y);
-            document.getElementById('net-profit-val-t1').textContent = formatCurrency(netProfit1Y);
-
-            // Table 2 Years
-            document.getElementById('upfront-fee-val-2').textContent = formatCurrency(upfrontFee);
-            document.getElementById('success-fee-val-2').textContent = `${successFeePerc}%`;
-            document.getElementById('wps-val-t2').textContent = formatCurrency(wps);
-            document.getElementById('savings-val-t2').textContent = formatCurrency(savings);
-            document.getElementById('interest-val-t2').textContent = formatCurrency(interest2Y);
-            document.getElementById('total-benefit-val-t2').textContent = formatCurrency(totalBenefit2Y);
-            document.getElementById('upfront-fee-val-t2').textContent = formatCurrency(upfrontFee);
-            document.getElementById('success-fee-perc-t2').textContent = `${successFeePerc}%`;
-            document.getElementById('success-fee-amount-t2').textContent = formatCurrency(successFeeAmount2Y);
-            document.getElementById('net-profit-val-t2').textContent = formatCurrency(netProfit2Y);
-            
-            // Installments
             document.getElementById('upfront-fee-val-installments').textContent = formatCurrency(upfrontFee);
             document.getElementById('installment-5').textContent = formatCurrency(upfrontFee / 5);
             document.getElementById('installment-10').textContent = formatCurrency(upfrontFee / 10);
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
-
-            updateCharts();
-        }
-        
-        function updateCharts() {
-            allTables.forEach(table => table.classList.remove('active'));
-            const activeTableId = `table-${currentDuration}`;
-            const activeTable = document.getElementById(activeTableId);
-            if (activeTable) activeTable.classList.add('active');
             
-            const urlParams = new URLSearchParams(window.location.search);
-            const wps = parseFloat(urlParams.get('wps'));
-            const savings = parseFloat(urlParams.get('savings'));
-            const upfrontFee = parseFloat(urlParams.get('upfrontFee'));
-
-            const interest1Y = wps * 0.105;
-            const interest2Y = wps * 0.105 * 2;
-            
-            const totalBenefit1Y = wps + savings + interest1Y;
-            const totalBenefit2Y = wps + savings + interest2Y;
-
-            const newPotentialProfit = currentDuration === '1' ? totalBenefit1Y : totalBenefit2Y;
-
-            investmentChart.data.datasets[0].data = [upfrontFee, newPotentialProfit];
+            investmentChart.data.datasets[0].data = [isOneYear ? totalInvestment1Y : totalInvestment2Y, isOneYear ? totalBenefit1Y : totalBenefit2Y];
             investmentChart.update();
-            
-            const newInterest = currentDuration === '1' ? interest1Y : interest2Y;
-            benefitChart.data.labels = ['Zwrot kosztów (WPS)', 'Oszczędność na ratach', `Odsetki Karne (po ${currentDuration} ${currentDuration === '1' ? 'roku' : 'latach'})`];
-            benefitChart.data.datasets[0].data = [wps, savings, newInterest];
-            benefitChart.update();
         }
-
-        durationButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                durationButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                currentDuration = button.dataset.duration;
-                updateCharts();
-            });
-        });
 
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('wps')) {
-                initializeCharts();
-                calculateAndDisplay(urlParams);
-            } else {
-                // This should not happen if the generator is used correctly,
-                // but as a fallback, we can show an error or a default message.
+            if (!urlParams.has('wps')) {
                 document.body.innerHTML = '<h1 class="text-white text-center text-2xl p-8">Błąd: Brak danych do wygenerowania oferty.</h1>';
+                return;
             }
-        });
+            
+            initializeChart();
+            
+            const durationButtons = document.querySelectorAll('.duration-btn');
+            durationButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    durationButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentDuration = button.dataset.duration;
+                    updateDisplay();
+                });
+            });
 
+            updateDisplay();
+        });
     </script>
 </body>
 </html>
