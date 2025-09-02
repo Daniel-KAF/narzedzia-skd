@@ -34,6 +34,30 @@
         .roi-card .label { font-size: 1.1rem; color: #9ca3af; }
         .roi-card .value { font-size: 2.5rem; font-weight: 900; color: #60a5fa; margin: 8px 0; }
         .roi-card .sub-text { font-size: 1rem; color: #d1d5db; }
+        /* NOWE STYLE DLA KAFELKÓW PROCESU */
+        .step-card {
+            background-color: #112240;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .step-icon {
+            width: 64px;
+            height: 64px;
+            background-color: #1f2937;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 16px;
+            border: 2px solid #FFC107;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -44,7 +68,31 @@
             <p class="text-lg text-gray-400 mt-2">Przygotowana symulacja korzyści finansowych</p>
         </header>
 
-        <p class="text-lg text-gray-400 mt-4 text-center mb-8">Proces w 4 krokach: ✍️ Umowa → ⚖️ Pozew → 🏆 Wygrana → 💰 Pieniądze na koncie!</p>
+        <section id="process-steps" class="mb-10">
+            <h3 class="text-2xl font-bold text-center text-white mb-6">Proces w 4 prostych krokach</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="step-card">
+                    <div class="step-icon">✍️</div>
+                    <h4 class="font-bold text-lg text-white mb-1">Krok 1: Umowa</h4>
+                    <p class="text-sm text-gray-400">Podpisanie umowy i start sprawy.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">⚖️</div>
+                    <h4 class="font-bold text-lg text-white mb-1">Krok 2: Pozew</h4>
+                    <p class="text-sm text-gray-400">Reprezentacja w sądzie.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">🏆</div>
+                    <h4 class="font-bold text-lg text-white mb-1">Krok 3: Wygrana</h4>
+                    <p class="text-sm text-gray-400">Doprowadzenie do korzystnego wyroku.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">💰</div>
+                    <h4 class="font-bold text-lg text-white mb-1">Krok 4: Pieniądze</h4>
+                    <p class="text-sm text-gray-400">Środki trafiają na konto.</p>
+                </div>
+            </div>
+        </section>
 
         <section id="summary-panel" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
             <div class="max-w-md mx-auto mb-8">
@@ -170,7 +218,6 @@
             document.getElementById('installment-10').textContent = formatCurrency(upfrontFee / 10);
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
             
-            // ZMIANA WPROWADZONA TUTAJ
             investmentChart.data.datasets[0].data = [upfrontFee, clientNetProfit > 0 ? clientNetProfit : 0];
             investmentChart.update();
         }
