@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator WPS (ze zmiennym oprocentowaniem)</title>
+    <title>Kalkulator WPS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
         body {
@@ -65,6 +65,21 @@
             margin-bottom: 5px;
             color: #9ca3af;
         }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+            color: #d1d5db;
+        }
+        input[type="checkbox"] {
+            width: 1.2em;
+            height: 1.2em;
+            accent-color: #34d399;
+        }
         input, select {
             width: 100%;
             padding: 10px;
@@ -87,6 +102,7 @@
             justify-content: space-between;
             align-items: center;
             border-left: 4px solid #4b5563;
+            gap: 20px;
         }
         .result-label {
             font-size: 14px;
@@ -94,11 +110,14 @@
             text-transform: uppercase;
             font-weight: 500;
             margin: 0;
+            line-height: 1.3;
         }
         .result-value {
             font-size: 26px;
             font-weight: 600;
             margin: 0;
+            text-align: right;
+            flex-shrink: 0;
         }
 
         .result-box.wps-highlight {
@@ -116,39 +135,55 @@
 
         @media (max-width: 800px) {
             .main-grid { grid-template-columns: 1fr; }
-            .result-box { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .result-box { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 5px; 
+            }
+            .result-value {
+                text-align: left;
+            }
         }
     </style>
 </head>
 <body>
     <header class="page-header">
         <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
-        <h2>Kalkulator Wartości Przedmiotu Sporu (SKD)</h2>
+        <h2>Kalkulator WPS</h2>
     </header>
     <div class="container">
         <div class="main-grid">
             <div class="input-section">
                 <div class="input-group">
                     <label for="kwotaKredytu">Kwota kredytu (tylko kapitał)</label>
-                    <input type="number" id="kwotaKredytu" value="100000" oninput="calculateWPS()">
+                    <input type="number" id="kwotaKredytu" oninput="calculateWPS()">
                 </div>
                 <div class="input-group">
                     <label for="prowizja">Prowizja w umowie (kwotowo)</label>
-                    <input type="number" id="prowizja" value="2560" oninput="calculateWPS()">
+                    <input type="number" id="prowizja" oninput="calculateWPS()">
                 </div>
                 <div class="input-group">
                     <label for="marza">Marża banku (%)</label>
-                    <input type="number" id="marza" value="2.5" step="0.01" oninput="calculateWPS()">
+                    <input type="number" id="marza" step="0.01" oninput="calculateWPS()">
                 </div>
                 <div class="input-group">
                     <label for="okresSplaty">Okres spłaty (msc)</label>
-                    <input type="number" id="okresSplaty" value="120" oninput="calculateWPS()">
+                    <input type="number" id="okresSplaty" oninput="calculateWPS()">
                 </div>
                 <div class="input-group">
                     <label for="dataPodpisania">Data podpisania umowy</label>
                     <input type="date" id="dataPodpisania" oninput="calculateWPS()">
                 </div>
-                <div class="input-group">
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="czySplacona">
+                    <label for="czySplacona">Czy umowa została spłacona w całości?</label>
+                </div>
+                <div class="input-group" id="poleDataZakonczenia" style="display: none;">
+                    <label for="dataZakonczenia">Data spłaty kredytu</label>
+                    <input type="date" id="dataZakonczenia" oninput="calculateWPS()">
+                </div>
+                <div class="input-group" id="poleDataSymulacji">
                     <label for="dataSymulacji">Data dzisiejsza</label>
                     <input type="date" id="dataSymulacji" oninput="calculateWPS()">
                 </div>
@@ -156,7 +191,7 @@
 
             <div class="results-section">
                 <div class="result-box wps-highlight">
-                    <p class="result-label">WPS (rzeczywiste odsetki + prowizja)</p>
+                    <p class="result-label">WPS</p>
                     <p class="result-value wps-value" id="wynikWpsWTrakcie">0,00 zł</p>
                 </div>
                 <div class="result-box">
@@ -173,8 +208,6 @@
 </div>
 
 <script>
-    // Baza danych z historycznymi notowaniami WIBOR 3M (pierwszy dzień kwartału)
-    // Źródło: Opracowanie własne na podstawie danych publicznych
     const wibor3mHistory = {
         '2025-07-01': 5.80, '2025-04-01': 5.80, '2025-01-01': 5.82,
         '2024-10-01': 5.84, '2024-07-01': 5.86, '2024-04-01': 5.87, '2024-01-01': 5.88,
@@ -203,71 +236,75 @@
         const prowizja = getValue('prowizja');
         const marza = getValue('marza');
         const n_total = getValue('okresSplaty');
-        
         const P_financed = P_base + prowizja;
 
         const dataPodpisaniaStr = document.getElementById('dataPodpisania').value;
+        const isPaidOff = document.getElementById('czySplacona').checked;
+        const dataZakonczeniaStr = document.getElementById('dataZakonczenia').value;
         const dataSymulacjiStr = document.getElementById('dataSymulacji').value;
 
-        if (!dataPodpisaniaStr || !dataSymulacjiStr) return;
+        let effectiveEndDateStr = isPaidOff ? dataZakonczeniaStr : dataSymulacjiStr;
+
+        if (!dataPodpisaniaStr || !effectiveEndDateStr) {
+            document.getElementById('wynikWpsWTrakcie').textContent = formatCurrency(0);
+            document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(0);
+            document.getElementById('wynikOdsetkiCalkowite').textContent = formatCurrency(0);
+            return;
+        }
 
         const dataPodpisania = new Date(dataPodpisaniaStr);
-        const dataSymulacji = new Date(dataSymulacjiStr);
+        const effectiveEndDate = new Date(effectiveEndDateStr);
         
         let pozostalyKapital = P_financed;
         let sumaRzeczywistychOdsetek = 0;
         let currentDate = new Date(dataPodpisania);
         let miesiaceSplacone = 0;
 
-        // Pętla do symulacji spłat dokonanych do dnia dzisiejszego
-        while(currentDate < dataSymulacji && miesiaceSplacone < n_total) {
-            const wibor = getWiborForDate(currentDate);
-            const rocznaStopa = marza + wibor;
-            const r_miesieczna = (rocznaStopa / 100) / 12;
-            
-            const odsetkiWMiesiacu = pozostalyKapital * r_miesieczna;
-            sumaRzeczywistychOdsetek += odsetkiWMiesiacu;
+        if (P_financed > 0) {
+            while(currentDate < effectiveEndDate && miesiaceSplacone < n_total) {
+                const wibor = getWiborForDate(currentDate);
+                const rocznaStopa = marza + wibor;
+                const r_miesieczna = (rocznaStopa / 100) / 12;
+                const odsetkiWMiesiacu = pozostalyKapital * r_miesieczna;
+                sumaRzeczywistychOdsetek += odsetkiWMiesiacu;
 
-            const n_pozostalo_w_petli = n_total - miesiaceSplacone;
-            
-            let rataMiesieczna = 0;
-            if (pozostalyKapital > 0 && n_pozostalo_w_petli > 0 && r_miesieczna > 0) {
-                 rataMiesieczna = pozostalyKapital * (r_miesieczna * Math.pow(1 + r_miesieczna, n_pozostalo_w_petli)) / (Math.pow(1 + r_miesieczna, n_pozostalo_w_petli) - 1);
-            } else if (pozostalyKapital > 0 && n_pozostalo_w_petli > 0) {
-                rataMiesieczna = pozostalyKapital / n_pozostalo_w_petli;
+                const n_pozostalo_w_petli = n_total - miesiaceSplacone;
+                let rataMiesieczna = 0;
+                if (pozostalyKapital > 0 && n_pozostalo_w_petli > 0 && r_miesieczna > 0) {
+                    rataMiesieczna = pozostalyKapital * (r_miesieczna * Math.pow(1 + r_miesieczna, n_pozostalo_w_petli)) / (Math.pow(1 + r_miesieczna, n_pozostalo_w_petli) - 1);
+                } else if (pozostalyKapital > 0 && n_pozostalo_w_petli > 0) {
+                    rataMiesieczna = pozostalyKapital / n_pozostalo_w_petli;
+                }
+                const splataKapitalu = rataMiesieczna - odsetkiWMiesiacu;
+                pozostalyKapital -= splataKapitalu;
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                miesiaceSplacone++;
             }
-            
-            const splataKapitalu = rataMiesieczna - odsetkiWMiesiacu;
-            pozostalyKapital -= splataKapitalu;
-
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            miesiaceSplacone++;
         }
 
-        const wpsWTrakcie = prowizja + sumaRzeczywistychOdsetek;
-
-        // --- NOWA LOGIKA DLA POZOSTAŁYCH ODSETEK ---
+        let wpsWTrakcie = 0;
         let odsetkiPozostale = 0;
-        const n_pozostalo = n_total - miesiaceSplacone;
-
-        if (pozostalyKapital > 0 && n_pozostalo > 0) {
-            // Zakładamy, że przyszłe oprocentowanie będzie równe oprocentowaniu z dnia symulacji
-            const wiborPrzyszly = getWiborForDate(dataSymulacji);
-            const przyszlaRocznaStopa = marza + wiborPrzyszly;
-            const r_przyszle_miesieczne = (przyszlaRocznaStopa / 100) / 12;
-
-            if (r_przyszle_miesieczne > 0) {
-                // Obliczamy nową, stałą ratę dla pozostałego okresu
-                const pmt_przyszle = pozostalyKapital * (r_przyszle_miesieczne * Math.pow(1 + r_przyszle_miesieczne, n_pozostalo)) / (Math.pow(1 + r_przyszle_miesieczne, n_pozostalo) - 1);
-                // Suma przyszłych odsetek to suma wszystkich przyszłych rat minus pozostały kapitał
-                odsetkiPozostale = (pmt_przyszle * n_pozostalo) - pozostalyKapital;
-            } else {
-                // Jeśli oprocentowanie jest zerowe, nie ma przyszłych odsetek
-                odsetkiPozostale = 0;
+        
+        if (isPaidOff) {
+            const miesiaceOszczedzone = n_total - miesiaceSplacone;
+            const zwrotProwizji = (prowizja / n_total) * miesiaceOszczedzone;
+            const faktycznyKosztProwizji = prowizja - zwrotProwizji;
+            wpsWTrakcie = faktycznyKosztProwizji + sumaRzeczywistychOdsetek;
+            odsetkiPozostale = 0; // Kredyt spłacony, więc nie ma przyszłych odsetek
+        } else {
+            wpsWTrakcie = prowizja + sumaRzeczywistychOdsetek;
+            const n_pozostalo = n_total - miesiaceSplacone;
+            if (pozostalyKapital > 0 && n_pozostalo > 0) {
+                const wiborPrzyszly = getWiborForDate(effectiveEndDate);
+                const przyszlaRocznaStopa = marza + wiborPrzyszly;
+                const r_przyszle_miesieczne = (przyszlaRocznaStopa / 100) / 12;
+                if (r_przyszle_miesieczne > 0) {
+                    const pmt_przyszle = pozostalyKapital * (r_przyszle_miesieczne * Math.pow(1 + r_przyszle_miesieczne, n_pozostalo)) / (Math.pow(1 + r_przyszle_miesieczne, n_pozostalo) - 1);
+                    odsetkiPozostale = (pmt_przyszle * n_pozostalo) - pozostalyKapital;
+                }
             }
         }
         
-        // Obliczenia dla wartości z umowy (do porównania) - tak jak wcześniej
         const umowneOprocentowanie = marza + getWiborForDate(dataPodpisania);
         const r_umowne = (umowneOprocentowanie / 100) / 12;
         let odsetkiCalkowiteWgUmowy = 0;
@@ -277,14 +314,26 @@
         }
         
         document.getElementById('wynikWpsWTrakcie').textContent = formatCurrency(wpsWTrakcie);
-        document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(odsetkiPozostale); // Zaktualizowane pole
+        document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(odsetkiPozostale);
         document.getElementById('wynikOdsetkiCalkowite').textContent = formatCurrency(odsetkiCalkowiteWgUmowy);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('dataPodpisania').value = "2022-06-08";
-        document.getElementById('dataSymulacji').value = new Date().toISOString().split('T')[0];
+    document.getElementById('czySplacona').addEventListener('change', function() {
+        const poleDataZakonczenia = document.getElementById('poleDataZakonczenia');
+        const poleDataSymulacji = document.getElementById('poleDataSymulacji');
+        if (this.checked) {
+            poleDataZakonczenia.style.display = 'block';
+            poleDataSymulacji.style.display = 'none';
+        } else {
+            poleDataZakonczenia.style.display = 'none';
+            poleDataSymulacji.style.display = 'block';
+        }
         calculateWPS();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('dataSymulacji').value = new Date().toISOString().split('T')[0];
+        calculateWPS(); 
     });
 </script>
 </body>
