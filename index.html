@@ -17,7 +17,7 @@
             text-align: center;
         }
         .main-container {
-            display: flex;
+            display: none; /* Ukrywamy domyślnie kontener z przyciskami */
             gap: 40px;
             padding: 40px;
             background-color: #424242;
@@ -71,7 +71,7 @@
     </style>
 </head>
 <body>
-    <div class="main-container">
+    <div class="main-container" id="mainContent">
         <div class="tool-column">
             <h1>SKD</h1>
             <div class="button-wrapper">
@@ -89,5 +89,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Ta funkcja uruchomi się automatycznie po załadowaniu strony
+        (function() {
+            // ▼▼▼ TUTAJ WPISZ SWOJE HASŁO ▼▼▼
+            const correctPassword = "Kaf999>"; 
+            // ▲▲▲ ZMIEŃ POWYŻSZE HASŁO ▲▲▲
+
+            let enteredPassword = prompt("Proszę podać hasło, aby uzyskać dostęp:");
+
+            if (enteredPassword === correctPassword) {
+                // Jeśli hasło jest poprawne, pokaż główną zawartość
+                document.getElementById("mainContent").style.display = "flex";
+            } else {
+                // Jeśli hasło jest niepoprawne, pokaż alert
+                alert("Nieprawidłowe hasło. Odśwież stronę, aby spróbować ponownie.");
+            }
+        })();
+    </script>
 </body>
 </html>
