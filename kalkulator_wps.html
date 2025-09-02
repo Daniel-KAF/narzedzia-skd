@@ -3,45 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator WPS</title>
+    <title>Kalkulator WPS - Wykres i Scenariusze</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        
+        :root {
+            --bg-color: #111827;
+            --container-bg: #1f2937;
+            --input-group-bg: #374151;
+            --input-bg: #4b5563;
+            --text-primary: #d1d5db;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --input-border: #6b7280;
+            --accent-green: #34d399;
+            --accent-blue: #60a5fa;
+            --error-color: #f87171;
+            --shadow-color: rgba(0,0,0,0.4);
+            --logo-border: rgba(255,255,255,0.1);
+        }
+
+        body.light-mode {
+            --bg-color: #f9fafb;
+            --container-bg: #ffffff;
+            --input-group-bg: #f3f4f6;
+            --input-bg: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --input-border: #d1d5db;
+            --shadow-color: rgba(0,0,0,0.1);
+            --logo-border: rgba(0,0,0,0.1);
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827;
-            color: #d1d5db;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
+        
+        .header-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
         .page-header {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 30px;
         }
         .logo {
             height: 80px;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border: 1px solid var(--logo-border);
         }
         h2 {
             text-align: left;
             margin: 0;
             font-weight: 900;
             font-size: 2.25rem;
-            background-image: linear-gradient(to right, #60a5fa, #34d399);
+            background-image: linear-gradient(to right, var(--accent-blue), var(--accent-green));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
+        
+        .theme-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input { display: none; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--input-bg);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-green); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background-color: #1f2937;
+            background-color: var(--container-bg);
             padding: 30px;
             border-radius: 8px;
-            border: 1px solid #374151;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .main-grid {
             display: grid;
@@ -54,103 +134,142 @@
             gap: 15px;
         }
         .input-group {
-            background-color: #374151;
+            background-color: var(--input-group-bg);
             padding: 10px 15px;
             border-radius: 8px;
+            transition: background-color 0.3s;
         }
         .input-group label {
             display: block;
             font-weight: 500;
             font-size: 14px;
             margin-bottom: 5px;
-            color: #9ca3af;
+            color: var(--text-secondary);
         }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-        }
-        .checkbox-group label {
-            margin-bottom: 0;
-            color: #d1d5db;
-        }
-        input[type="checkbox"] {
-            width: 1.2em;
-            height: 1.2em;
-            accent-color: #34d399;
-        }
-        input, select {
+        input, select, button {
             width: 100%;
             padding: 10px;
-            background-color: #4b5563;
-            color: #f9fafb;
-            border: 1px solid #6b7280;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--input-border);
             border-radius: 6px;
             font-size: 16px;
             box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
+        button { cursor: pointer; font-weight: 500;}
+        button:hover {
+             filter: brightness(1.1);
+        }
+        input.input-error { border-color: var(--error-color); }
+        .error-message { color: var(--error-color); font-size: 12px; margin-top: 5px; }
         
-        .results-section {
-            gap: 12px;
+        .checkbox-group { display: flex; align-items: center; gap: 10px; padding: 10px 15px; }
+        .checkbox-group label { margin-bottom: 0; color: var(--text-primary); }
+        input[type="checkbox"] { width: 1.2em; height: 1.2em; accent-color: var(--accent-green); }
+        
+        .collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            padding: 0 10px;
         }
+        .collapsible.visible { max-height: 100px; opacity: 1; padding: 0; }
+
+        #overpayments-container .input-group { display: flex; gap: 10px; align-items: center; }
+        #overpayments-container .input-group > div { flex-grow: 1; }
+        .remove-btn {
+            background: none; border: none; color: var(--error-color);
+            font-size: 24px; cursor: pointer; padding: 0 5px; width: auto;
+        }
+        .add-btn {
+            background-color: var(--input-group-bg); border: 1px dashed var(--input-border);
+            color: var(--text-secondary);
+        }
+        .add-btn:hover { background-color: var(--input-bg); color: var(--text-primary); }
+
+        .results-section { gap: 12px; }
         .result-box {
-            background-color: #374151;
+            background-color: var(--input-group-bg);
             padding: 15px 20px;
             border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid #4b5563;
+            border-left: 4px solid var(--input-bg);
             gap: 20px;
         }
-        .result-label {
-            font-size: 14px;
-            color: #9ca3af;
-            text-transform: uppercase;
-            font-weight: 500;
-            margin: 0;
-            line-height: 1.3;
+        .result-label-group { display: flex; align-items: center; gap: 8px; position: relative; }
+        .result-label { font-size: 14px; color: var(--text-secondary); text-transform: uppercase; font-weight: 500; margin: 0; line-height: 1.3; }
+        .tooltip-icon { font-size: 16px; color: var(--text-secondary); cursor: help; }
+        .tooltip-text {
+            visibility: hidden; width: 220px; background-color: var(--bg-color); color: var(--text-primary);
+            text-align: center; border-radius: 6px; padding: 8px; position: absolute;
+            z-index: 1; bottom: 125%; left: 50%; margin-left: -110px;
+            opacity: 0; transition: opacity 0.3s; border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px var(--shadow-color); font-size: 12px; text-transform: none;
         }
-        .result-value {
-            font-size: 26px;
-            font-weight: 600;
-            margin: 0;
-            text-align: right;
-            flex-shrink: 0;
+        .result-label-group:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .result-value { font-size: 26px; font-weight: 600; margin: 0; text-align: right; flex-shrink: 0; }
+        .result-box.wps-highlight { border-left-color: var(--accent-green); }
+        .result-value.wps-value { color: var(--accent-green); font-weight: 700; font-size: 28px; }
+        .result-value.secondary-value { color: var(--text-secondary); font-weight: 500; }
+        
+        .scenario-manager {
+            background-color: var(--input-group-bg);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .scenario-manager .actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        .scenario-manager input[type="text"] {
+            margin-bottom: 5px;
+        }
+        .scenario-manager select { flex-grow: 1; }
+        .scenario-manager button { width: auto; padding: 10px 15px; }
+        #saveScenarioBtn { background-color: var(--accent-green); border-color: var(--accent-green); color: #fff;}
+        #deleteScenarioBtn { background-color: var(--error-color); border-color: var(--error-color); color: #fff;}
+
+        .chart-container {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--input-group-bg);
+            border-radius: 8px;
         }
 
-        .result-box.wps-highlight {
-            border-left-color: #34d399;
-        }
-        .result-value.wps-value {
-            color: #34d399;
-            font-weight: 700;
-            font-size: 28px;
-        }
-        .result-value.secondary-value {
-            color: #9ca3af;
-            font-weight: 500;
-        }
 
         @media (max-width: 800px) {
             .main-grid { grid-template-columns: 1fr; }
-            .result-box { 
-                flex-direction: column; 
-                align-items: flex-start; 
-                gap: 5px; 
-            }
-            .result-value {
-                text-align: left;
-            }
+            .result-box { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .result-value { text-align: left; }
+            .header-container { flex-direction: column; }
+            .theme-switcher { position: static; margin-top: 15px; }
         }
     </style>
 </head>
 <body>
-    <header class="page-header">
-        <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
-        <h2>Kalkulator WPS</h2>
-    </header>
+    <div class="header-container">
+        <header class="page-header">
+            <img src="https://daniel-kaf.github.io/narzedzia-skd/logo.png" alt="Logo KAF" class="logo">
+            <h2>Kalkulator WPS</h2>
+        </header>
+        <div class="theme-switcher">
+            <span>☀️</span>
+            <label class="switch">
+                <input type="checkbox" id="themeToggle">
+                <span class="slider"></span>
+            </label>
+            <span>🌙</span>
+        </div>
+    </div>
     <div class="container">
         <div class="main-grid">
             <div class="input-section">
@@ -179,35 +298,68 @@
                     <input type="checkbox" id="czySplacona">
                     <label for="czySplacona">Czy umowa została spłacona w całości?</label>
                 </div>
-                <div class="input-group" id="poleDataZakonczenia" style="display: none;">
-                    <label for="dataZakonczenia">Data spłaty kredytu</label>
-                    <input type="date" id="dataZakonczenia" oninput="calculateWPS()">
+                <div id="poleDataZakonczeniaWrapper" class="collapsible">
+                    <div class="input-group">
+                        <label for="dataZakonczenia">Data spłaty kredytu</label>
+                        <input type="date" id="dataZakonczenia" oninput="calculateWPS()">
+                        <p class="error-message" id="date-error" style="display: none;"></p>
+                    </div>
                 </div>
-                <div class="input-group" id="poleDataSymulacji">
+                
+                <div id="poleDataSymulacji" class="input-group">
                     <label for="dataSymulacji">Data dzisiejsza</label>
                     <input type="date" id="dataSymulacji" oninput="calculateWPS()">
                 </div>
+
+                <div id="overpayments-container"></div>
+                <button id="addOverpaymentBtn" class="add-btn">➕ Dodaj nadpłatę</button>
             </div>
 
             <div class="results-section">
                 <div class="result-box wps-highlight">
-                    <p class="result-label">WPS</p>
+                    <div class="result-label-group">
+                        <p class="result-label">WPS</p>
+                        <span class="tooltip-icon">❓</span>
+                        <span class="tooltip-text">Wartość Przedmiotu Sporu. Suma zapłaconych odsetek i prowizji (lub jej proporcjonalnej części w przypadku spłaty).</span>
+                    </div>
                     <p class="result-value wps-value" id="wynikWpsWTrakcie">0,00 zł</p>
                 </div>
                 <div class="result-box">
-                    <p class="result-label">Odsetki pozostałe do spłaty (prognoza)</p>
+                    <div class="result-label-group">
+                        <p class="result-label">Odsetki pozostałe</p>
+                        <span class="tooltip-icon">❓</span>
+                        <span class="tooltip-text">Prognozowana suma odsetek do zapłaty do końca umowy przy obecnym oprocentowaniu.</span>
+                    </div>
                     <p class="result-value secondary-value" id="wynikUmorzoneOdsetki">0,00 zł</p>
                 </div>
                  <div class="result-box">
-                    <p class="result-label">Odsetki całkowite (wg umowy)</p>
+                    <div class="result-label-group">
+                        <p class="result-label">Odsetki całkowite</p>
+                        <span class="tooltip-icon">❓</span>
+                        <span class="tooltip-text">Teoretyczna suma odsetek na cały okres kredytu, liczona wg oprocentowania z dnia umowy.</span>
+                    </div>
                     <p class="result-value secondary-value" id="wynikOdsetkiCalkowite">0,00 zł</p>
                 </div>
+                
+                <div class="scenario-manager">
+                    <input type="text" id="scenarioSearch" placeholder="Filtruj scenariusze...">
+                    <select id="scenariosDropdown"></select>
+                    <div class="actions">
+                        <button id="saveScenarioBtn">💾 Zapisz</button>
+                        <button id="deleteScenarioBtn">🗑️ Usuń</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="capitalChart"></canvas>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // --- BAZA DANYCH WIBOR ---
     const wibor3mHistory = {
         '2025-07-01': 5.80, '2025-04-01': 5.80, '2025-01-01': 5.82,
         '2024-10-01': 5.84, '2024-07-01': 5.86, '2024-04-01': 5.87, '2024-01-01': 5.88,
@@ -219,6 +371,7 @@
 
     const formatCurrency = (value) => (value || 0).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
     const getValue = (id) => parseFloat(document.getElementById(id).value) || 0;
+    let capitalChart = null; // Zmienna globalna przechowująca instancję wykresu
 
     function getWiborForDate(date) {
         let closestDate = null;
@@ -231,27 +384,123 @@
         return closestDate ? wibor3mHistory[closestDate.toISOString().split('T')[0]] : 0;
     }
     
+    function validateDates(startDateStr, endDateStr) {
+        const errorMsg = document.getElementById('date-error');
+        const endDateInput = document.getElementById('dataZakonczenia');
+        if (!startDateStr || !endDateStr) {
+            errorMsg.style.display = 'none';
+            endDateInput.classList.remove('input-error');
+            return true;
+        }
+        const startDate = new Date(startDateStr);
+        const endDate = new Date(endDateStr);
+        if (endDate < startDate) {
+            errorMsg.textContent = 'Data spłaty nie może być wcześniejsza niż data podpisania.';
+            errorMsg.style.display = 'block';
+            endDateInput.classList.add('input-error');
+            return false;
+        } else {
+            errorMsg.style.display = 'none';
+            endDateInput.classList.remove('input-error');
+            return true;
+        }
+    }
+
+    function updateChart(labels, capitalData, interestData) {
+        const ctx = document.getElementById('capitalChart').getContext('2d');
+        const isDarkMode = !document.body.classList.contains('light-mode');
+        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const textColor = isDarkMode ? '#d1d5db' : '#1f2937';
+
+        if (capitalChart) {
+            capitalChart.destroy();
+        }
+        capitalChart = new Chart(ctx, {
+            type: 'bar', // Zmiana na bar, żeby poprawnie mieszać typy
+            data: {
+                labels: labels,
+                datasets: [{
+                    type: 'line', // Ten dataset będzie linią
+                    label: 'Pozostały kapitał',
+                    data: capitalData,
+                    borderColor: 'rgb(52, 211, 153)',
+                    backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    yAxisID: 'yCapital',
+                },{
+                    type: 'bar', // Ten dataset będzie słupkami
+                    label: 'Miesięczne odsetki',
+                    data: interestData,
+                    backgroundColor: 'rgba(96, 165, 250, 0.5)',
+                    borderColor: 'rgb(96, 165, 250)',
+                    yAxisID: 'yInterest',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yCapital: { 
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: { color: textColor },
+                        grid: { color: gridColor },
+                        title: { display: true, text: 'Kapitał (PLN)', color: textColor }
+                    },
+                    yInterest: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: { color: textColor },
+                        grid: { drawOnChartArea: false }, // Tylko jedna siatka główna
+                        title: { display: true, text: 'Odsetki (PLN)', color: textColor }
+                    },
+                    x: {
+                        ticks: { color: textColor },
+                        grid: { color: gridColor }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: textColor }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            }
+        });
+    }
+
     function calculateWPS() {
         const P_base = getValue('kwotaKredytu');
         const prowizja = getValue('prowizja');
         const marza = getValue('marza');
         const n_total = getValue('okresSplaty');
         const P_financed = P_base + prowizja;
-
         const dataPodpisaniaStr = document.getElementById('dataPodpisania').value;
         const isPaidOff = document.getElementById('czySplacona').checked;
         const dataZakonczeniaStr = document.getElementById('dataZakonczenia').value;
         const dataSymulacjiStr = document.getElementById('dataSymulacji').value;
 
+        if (isPaidOff && !validateDates(dataPodpisaniaStr, dataZakonczeniaStr)) return;
+
         let effectiveEndDateStr = isPaidOff ? dataZakonczeniaStr : dataSymulacjiStr;
 
-        if (!dataPodpisaniaStr || !effectiveEndDateStr) {
-            document.getElementById('wynikWpsWTrakcie').textContent = formatCurrency(0);
-            document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(0);
-            document.getElementById('wynikOdsetkiCalkowite').textContent = formatCurrency(0);
-            return;
-        }
+        if (!dataPodpisaniaStr || !effectiveEndDateStr) return;
 
+        const overpayments = [];
+        document.querySelectorAll('.overpayment-item').forEach(item => {
+            const date = item.querySelector('input[type="date"]').value;
+            const amount = parseFloat(item.querySelector('input[type="number"]').value) || 0;
+            if (date && amount > 0) overpayments.push({ date: new Date(date), amount });
+        });
+        overpayments.sort((a, b) => a.date - b.date);
+        
         const dataPodpisania = new Date(dataPodpisaniaStr);
         const effectiveEndDate = new Date(effectiveEndDateStr);
         
@@ -259,9 +508,19 @@
         let sumaRzeczywistychOdsetek = 0;
         let currentDate = new Date(dataPodpisania);
         let miesiaceSplacone = 0;
+        
+        const chartLabels = [dataPodpisania.toLocaleDateString('sv')];
+        const chartCapitalData = [pozostalyKapital];
+        const chartInterestData = [0]; // Zaczynamy od zera odsetek na start
 
         if (P_financed > 0) {
             while(currentDate < effectiveEndDate && miesiaceSplacone < n_total) {
+                overpayments.forEach(op => {
+                    if (op.date.getFullYear() === currentDate.getFullYear() && op.date.getMonth() === currentDate.getMonth()) {
+                        pozostalyKapital -= op.amount;
+                    }
+                });
+
                 const wibor = getWiborForDate(currentDate);
                 const rocznaStopa = marza + wibor;
                 const r_miesieczna = (rocznaStopa / 100) / 12;
@@ -277,20 +536,26 @@
                 }
                 const splataKapitalu = rataMiesieczna - odsetkiWMiesiacu;
                 pozostalyKapital -= splataKapitalu;
+                
                 currentDate.setMonth(currentDate.getMonth() + 1);
                 miesiaceSplacone++;
+                
+                chartLabels.push(currentDate.toLocaleDateString('sv'));
+                chartCapitalData.push(Math.max(0, pozostalyKapital));
+                chartInterestData.push(odsetkiWMiesiacu);
             }
         }
-
+        pozostalyKapital = Math.max(0, pozostalyKapital);
+        
         let wpsWTrakcie = 0;
         let odsetkiPozostale = 0;
         
         if (isPaidOff) {
-            const miesiaceOszczedzone = n_total - miesiaceSplacone;
-            const zwrotProwizji = (prowizja / n_total) * miesiaceOszczedzone;
+            const miesiaceOszczedzone = n_total > 0 ? n_total - miesiaceSplacone : 0;
+            const zwrotProwizji = n_total > 0 ? (prowizja / n_total) * miesiaceOszczedzone : 0;
             const faktycznyKosztProwizji = prowizja - zwrotProwizji;
             wpsWTrakcie = faktycznyKosztProwizji + sumaRzeczywistychOdsetek;
-            odsetkiPozostale = 0; // Kredyt spłacony, więc nie ma przyszłych odsetek
+            odsetkiPozostale = 0;
         } else {
             wpsWTrakcie = prowizja + sumaRzeczywistychOdsetek;
             const n_pozostalo = n_total - miesiaceSplacone;
@@ -298,9 +563,21 @@
                 const wiborPrzyszly = getWiborForDate(effectiveEndDate);
                 const przyszlaRocznaStopa = marza + wiborPrzyszly;
                 const r_przyszle_miesieczne = (przyszlaRocznaStopa / 100) / 12;
-                if (r_przyszle_miesieczne > 0) {
-                    const pmt_przyszle = pozostalyKapital * (r_przyszle_miesieczne * Math.pow(1 + r_przyszle_miesieczne, n_pozostalo)) / (Math.pow(1 + r_przyszle_miesieczne, n_pozostalo) - 1);
-                    odsetkiPozostale = (pmt_przyszle * n_pozostalo) - pozostalyKapital;
+                if (r_przyszle_miesieczne >= 0) {
+                    let tempCapital = pozostalyKapital;
+                    for (let i = 0; i < n_pozostalo; i++) {
+                        const n_rat_do_konca = n_pozostalo - i;
+                        const pmt_przyszle = (tempCapital > 0 && r_przyszle_miesieczne > 0) ? tempCapital * (r_przyszle_miesieczne * Math.pow(1 + r_przyszle_miesieczne, n_rat_do_konca)) / (Math.pow(1 + r_przyszle_miesieczne, n_rat_do_konca) - 1) : (tempCapital / n_rat_do_konca);
+                        const futureInterest = tempCapital * r_przyszle_miesieczne;
+                        odsetkiPozostale += futureInterest;
+                        tempCapital -= (pmt_przyszle - futureInterest);
+                        
+                        let futureDate = new Date(effectiveEndDate);
+                        futureDate.setMonth(futureDate.getMonth() + i + 1);
+                        chartLabels.push(futureDate.toLocaleDateString('sv'));
+                        chartCapitalData.push(Math.max(0, tempCapital));
+                        chartInterestData.push(futureInterest);
+                    }
                 }
             }
         }
@@ -316,24 +593,181 @@
         document.getElementById('wynikWpsWTrakcie').textContent = formatCurrency(wpsWTrakcie);
         document.getElementById('wynikUmorzoneOdsetki').textContent = formatCurrency(odsetkiPozostale);
         document.getElementById('wynikOdsetkiCalkowite').textContent = formatCurrency(odsetkiCalkowiteWgUmowy);
+        updateChart(chartLabels, chartCapitalData, chartInterestData);
+    }
+    
+    // --- Scenario Management ---
+    const SCENARIOS_KEY = 'wpsCalculatorScenarios';
+
+    function getScenarios() {
+        return JSON.parse(localStorage.getItem(SCENARIOS_KEY)) || [];
     }
 
-    document.getElementById('czySplacona').addEventListener('change', function() {
-        const poleDataZakonczenia = document.getElementById('poleDataZakonczenia');
-        const poleDataSymulacji = document.getElementById('poleDataSymulacji');
-        if (this.checked) {
-            poleDataZakonczenia.style.display = 'block';
-            poleDataSymulacji.style.display = 'none';
+    function saveScenario(name, data) {
+        const scenarios = getScenarios();
+        const existingIndex = scenarios.findIndex(s => s.name === name);
+        if (existingIndex > -1) {
+            scenarios[existingIndex] = data; // Update
         } else {
-            poleDataZakonczenia.style.display = 'none';
-            poleDataSymulacji.style.display = 'block';
+            scenarios.push(data); // Add new
         }
+        localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
+    }
+
+    function deleteScenario(name) {
+        let scenarios = getScenarios();
+        scenarios = scenarios.filter(s => s.name !== name);
+        localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
+    }
+
+    function populateScenariosDropdown() {
+        const scenarios = getScenarios();
+        scenarios.sort((a, b) => a.name.localeCompare(b.name, 'pl', { sensitivity: 'base' }));
+
+        const dropdown = document.getElementById('scenariosDropdown');
+        dropdown.innerHTML = '<option value="">Wczytaj scenariusz...</option>';
+        scenarios.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s.name;
+            option.textContent = s.name;
+            dropdown.appendChild(option);
+        });
+    }
+
+    function collectFormData(name) {
+        const overpayments = [];
+        document.querySelectorAll('.overpayment-item').forEach(item => {
+            overpayments.push({
+                amount: item.querySelector('input[type="number"]').value,
+                date: item.querySelector('input[type="date"]').value
+            });
+        });
+        return {
+            name: name,
+            kwotaKredytu: document.getElementById('kwotaKredytu').value,
+            prowizja: document.getElementById('prowizja').value,
+            marza: document.getElementById('marza').value,
+            okresSplaty: document.getElementById('okresSplaty').value,
+            dataPodpisania: document.getElementById('dataPodpisania').value,
+            czySplacona: document.getElementById('czySplacona').checked,
+            dataZakonczenia: document.getElementById('dataZakonczenia').value,
+            dataSymulacji: document.getElementById('dataSymulacji').value,
+            overpayments: overpayments
+        };
+    }
+
+    function applyScenario(scenario) {
+        document.getElementById('kwotaKredytu').value = scenario.kwotaKredytu;
+        document.getElementById('prowizja').value = scenario.prowizja;
+        document.getElementById('marza').value = scenario.marza;
+        document.getElementById('okresSplaty').value = scenario.okresSplaty;
+        document.getElementById('dataPodpisania').value = scenario.dataPodpisania;
+        document.getElementById('czySplacona').checked = scenario.czySplacona;
+        document.getElementById('dataZakonczenia').value = scenario.dataZakonczenia;
+        document.getElementById('dataSymulacji').value = scenario.dataSymulacji;
+
+        const container = document.getElementById('overpayments-container');
+        container.innerHTML = '';
+        if(scenario.overpayments) {
+            scenario.overpayments.forEach(op => {
+                addOverpaymentRow(op.amount, op.date);
+            });
+        }
+        
+        document.getElementById('czySplacona').dispatchEvent(new Event('change'));
         calculateWPS();
-    });
+    }
+    
+    function addOverpaymentRow(amount = '', date = '') {
+        const container = document.getElementById('overpayments-container');
+        const newOverpayment = document.createElement('div');
+        newOverpayment.className = 'input-group overpayment-item';
+        newOverpayment.innerHTML = `
+            <div><label>Kwota nadpłaty</label><input type="number" value="${amount}" oninput="calculateWPS()"></div>
+            <div><label>Data nadpłaty</label><input type="date" value="${date}" oninput="calculateWPS()"></div>
+            <button class="remove-btn">❌</button>
+        `;
+        container.appendChild(newOverpayment);
+        newOverpayment.querySelector('.remove-btn').addEventListener('click', function() {
+            this.parentElement.remove();
+            calculateWPS();
+        });
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+            themeToggle.checked = false;
+        } else {
+            themeToggle.checked = true;
+        }
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                document.body.classList.remove('light-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.add('light-mode');
+                localStorage.setItem('theme', 'light');
+            }
+            calculateWPS();
+        });
+
+        document.getElementById('czySplacona').addEventListener('change', function() {
+            const wrapper = document.getElementById('poleDataZakonczeniaWrapper');
+            const poleDataSymulacji = document.getElementById('poleDataSymulacji');
+            if (this.checked) {
+                wrapper.classList.add('visible');
+                poleDataSymulacji.style.display = 'none';
+            } else {
+                wrapper.classList.remove('visible');
+                poleDataSymulacji.style.display = 'block';
+            }
+            calculateWPS();
+        });
+
+        document.getElementById('addOverpaymentBtn').addEventListener('click', () => addOverpaymentRow());
+
+        document.getElementById('saveScenarioBtn').addEventListener('click', () => {
+            const name = prompt("Podaj nazwę dla zapisu scenariusza:", "");
+            if (name && name.trim() !== '') {
+                const data = collectFormData(name.trim());
+                saveScenario(name.trim(), data);
+                populateScenariosDropdown();
+                alert(`Scenariusz "${name.trim()}" został zapisany!`);
+            }
+        });
+        
+        document.getElementById('scenariosDropdown').addEventListener('change', function() {
+            if (!this.value) return;
+            const scenarios = getScenarios();
+            const scenario = scenarios.find(s => s.name === this.value);
+            if (scenario) applyScenario(scenario);
+        });
+
+        document.getElementById('deleteScenarioBtn').addEventListener('click', () => {
+            const dropdown = document.getElementById('scenariosDropdown');
+            const name = dropdown.value;
+            if (name && confirm(`Czy na pewno chcesz usunąć scenariusz "${name}"?`)) {
+                deleteScenario(name);
+                populateScenariosDropdown();
+                alert(`Scenariusz "${name}" został usunięty.`);
+            }
+        });
+        
+        document.getElementById('scenarioSearch').addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const options = document.querySelectorAll('#scenariosDropdown option');
+            options.forEach(option => {
+                if(option.value === "") return;
+                const text = option.textContent.toLowerCase();
+                option.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+
         document.getElementById('dataSymulacji').value = new Date().toISOString().split('T')[0];
-        calculateWPS(); 
+        populateScenariosDropdown();
+        calculateWPS();
     });
 </script>
 </body>
