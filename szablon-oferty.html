@@ -11,7 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .control-btn.active { background-color: #FFC107; color: #0A192F; }
         .chart-container { position: relative; height: 250px; width: 100%; max-width: 500px; margin: auto; }
         .summary-table { width: 100%; border-collapse: collapse; }
         .summary-table td { padding: 12px 8px; border-bottom: 1px solid #374151; }
@@ -23,6 +22,10 @@
         .summary-table .total-row td { border-top: 2px solid #FFC107; padding-top: 15px; font-size: 1.25rem; font-weight: 900; }
         .summary-table .total-row .label { color: white; }
         .summary-table .total-row .amount { color: #FFC107; }
+        /* Style dla suwaka */
+        input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #374151; border-radius: 4px; outline: none; transition: opacity .2s; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
+        input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -33,30 +36,41 @@
             <p class="text-lg text-gray-400 mt-2">Przygotowana symulacja korzyści finansowych</p>
         </header>
 
+        <p class="text-lg text-gray-400 mt-4 text-center mb-8">Proces w 4 krokach: ✍️ Umowa → ⚖️ Pozew → 🏆 Wygrana → 💰 Pieniądze na koncie!</p>
+
         <section id="summary-panel" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
-            <h3 class="text-2xl font-bold text-center text-white mb-4">Proszę wybrać czas trwania procesu:</h3>
-            <div class="flex justify-center border border-gray-700 rounded-lg p-1 bg-[#0A192F] max-w-sm mx-auto mb-8">
-                <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition active" data-duration="1">Proces 1 rok</button>
-                <button class="control-btn duration-btn flex-1 p-3 rounded-md font-bold transition" data-duration="2">Proces 2 lata</button>
+            <div class="max-w-md mx-auto mb-8">
+                <label for="durationSlider" class="block text-center text-2xl font-bold text-white mb-3">
+                    Przewidywany czas trwania procesu: <span id="durationValue" class="text-[#FFC107]">12 miesięcy</span>
+                </label>
+                <input type="range" id="durationSlider" min="3" max="36" value="12" class="w-full">
             </div>
 
             <table class="summary-table max-w-2xl mx-auto">
                 <tbody>
                     <tr>
-                        <td class="label">Zwrot na konto (WPS + Odsetki)</td>
-                        <td class="amount green-text" id="calc-return"></td>
+                        <td class="label">Zwrot kapitału (WPS)</td>
+                        <td class="amount green-text" id="calc-wps"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Naliczone odsetki karne</td>
+                        <td class="amount green-text" id="calc-interest"></td>
                     </tr>
                     <tr>
                         <td class="label">Dodatkowa korzyść (Oszczędność na ratach)</td>
                         <td class="amount green-text" id="calc-savings"></td>
                     </tr>
                     <tr>
-                        <td class="label">Success Fee Kancelarii (prowizja od sukcesu)</td>
-                        <td class="amount red-text" id="calc-success-fee"></td>
-                    </tr>
-                    <tr>
                         <td class="label">Koszty na start (Opłata wstępna)</td>
                         <td class="amount red-text" id="calc-upfront-fee"></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Opłata za ewentualną II instancję</td>
+                        <td class="amount red-text">- 922,50 zł</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Success Fee Kancelarii (prowizja od sukcesu)</td>
+                        <td class="amount red-text" id="calc-success-fee"></td>
                     </tr>
                     <tr class="total-row">
                         <td class="label">ZYSK NA CZYSTO</td>
@@ -82,8 +96,7 @@
         </section>
 
         <footer class="text-center py-6">
-             <p class="text-lg text-gray-400">Proces w 4 krokach: ✍️ Umowa → ⚖️ Pozew → 🏆 Wygrana → 💰 Pieniądze na koncie!</p>
-             <p class="text-lg text-gray-400 mt-4">W razie pytań jestem do dyspozycji</p>
+             <p class="text-lg text-gray-400">W razie pytań jestem do dyspozycji</p>
              <p class="text-xl font-bold text-white mt-2">Daniel Daniszewski 508 171 922</p>
         </footer>
     </div>
@@ -91,7 +104,6 @@
     <script>
         const formatCurrency = (value) => value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 2 });
         let investmentChart;
-        let currentDuration = '1';
 
         function initializeChart() {
             const ctx = document.getElementById('investmentVsProfitChart').getContext('2d');
@@ -105,42 +117,34 @@
         function updateDisplay() {
             const params = new URLSearchParams(window.location.search);
             const wps = parseFloat(params.get('wps')) || 0;
-            const savings = parseFloat(params.get('savings')) || 0; // Oszczędność na ratach
-            const upfrontFee = parseFloat(params.get('upfrontFee')) || 0; // Zbiorcza opłata wstępna
-            const successFeePerc = parseFloat(params.get('successFee')) / 100 || 0; // Procent dla kancelarii
-
-            // Stałe i założenia z kalkulatora
-            const annualInterestRate = 0.105; // Roczne oprocentowanie odsetek
+            const savings = parseFloat(params.get('savings')) || 0;
+            const upfrontFee = parseFloat(params.get('upfrontFee')) || 0;
+            const successFeePerc = parseFloat(params.get('successFee')) / 100 || 0;
             
-            // Obliczenia dla 1 roku i 2 lat
-            const interest1Y = wps * annualInterestRate;
-            const interest2Y = wps * annualInterestRate * 2;
+            // Pobieranie wartości z nowego suwaka
+            const durationSlider = document.getElementById('durationSlider');
+            const durationMonths = parseInt(durationSlider.value);
+            document.getElementById('durationValue').textContent = `${durationMonths} miesi${durationMonths === 1 ? 'ąc' : (durationMonths < 5 ? 'ące' : 'ęcy')}`;
 
-            const totalRecovered1Y = wps + interest1Y;
-            const totalRecovered2Y = wps + interest2Y;
 
-            const clientGrossProfit1Y = totalRecovered1Y + savings; // To jest "Suma korzyści"
-            const clientGrossProfit2Y = totalRecovered2Y + savings;
-
-            const successFeeAmount1Y = clientGrossProfit1Y * successFeePerc;
-            const successFeeAmount2Y = clientGrossProfit2Y * successFeePerc;
+            const annualInterestRate = 0.105;
+            const fee2ndInstance = 922.50; // Stała opłata za II instancję
             
-            // Końcowy zysk netto
-            const clientNetProfit1Y = clientGrossProfit1Y - successFeeAmount1Y - upfrontFee;
-            const clientNetProfit2Y = clientGrossProfit2Y - successFeeAmount2Y - upfrontFee;
-
-            // Update display based on currentDuration
-            const isOneYear = currentDuration === '1';
-            const netProfit = isOneYear ? clientNetProfit1Y : clientNetProfit2Y;
-            const totalRecovered = isOneYear ? totalRecovered1Y : totalRecovered2Y;
-            const successFeeAmount = isOneYear ? successFeeAmount1Y : successFeeAmount2Y;
+            // Dynamiczne obliczenia na podstawie suwaka
+            const interestTotal = wps * (annualInterestRate / 12) * durationMonths;
+            const clientGrossProfit = wps + interestTotal + savings; // To jest "Suma korzyści"
+            const successFeeAmount = clientGrossProfit * successFeePerc;
             
-            // Aktualizacja nowej tabeli
-            document.getElementById('calc-return').textContent = "+ " + formatCurrency(totalRecovered);
+            // Końcowy zysk netto z uwzględnieniem nowej opłaty
+            const clientNetProfit = clientGrossProfit - successFeeAmount - upfrontFee - fee2ndInstance;
+            
+            // Aktualizacja nowej, rozbitej tabeli
+            document.getElementById('calc-wps').textContent = "+ " + formatCurrency(wps);
+            document.getElementById('calc-interest').textContent = "+ " + formatCurrency(interestTotal);
             document.getElementById('calc-savings').textContent = "+ " + formatCurrency(savings);
-            document.getElementById('calc-success-fee').textContent = "- " + formatCurrency(successFeeAmount);
             document.getElementById('calc-upfront-fee').textContent = "- " + formatCurrency(upfrontFee);
-            document.getElementById('calc-net-profit').textContent = formatCurrency(netProfit);
+            document.getElementById('calc-success-fee').textContent = "- " + formatCurrency(successFeeAmount);
+            document.getElementById('calc-net-profit').textContent = formatCurrency(clientNetProfit);
 
             // Aktualizacja sekcji ratalnej
             document.getElementById('upfront-fee-val-installments').textContent = formatCurrency(upfrontFee);
@@ -149,7 +153,8 @@
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
             
             // Aktualizacja wykresu
-            investmentChart.data.datasets[0].data = [upfrontFee, netProfit > 0 ? netProfit : 0];
+            const totalUpfrontInvestment = upfrontFee + fee2ndInstance;
+            investmentChart.data.datasets[0].data = [totalUpfrontInvestment, clientNetProfit > 0 ? clientNetProfit : 0];
             investmentChart.update();
         }
 
@@ -162,17 +167,11 @@
             
             initializeChart();
             
-            const durationButtons = document.querySelectorAll('.duration-btn');
-            durationButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    durationButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    currentDuration = button.dataset.duration;
-                    updateDisplay();
-                });
-            });
+            // Event listener dla nowego suwaka
+            const durationSlider = document.getElementById('durationSlider');
+            durationSlider.addEventListener('input', updateDisplay);
 
-            updateDisplay();
+            updateDisplay(); // Wywołanie na starcie
         });
     </script>
 </body>
