@@ -19,6 +19,7 @@
             --input-border: #6b7280;
             --accent-green: #34d399;
             --accent-blue: #60a5fa;
+            --accent-yellow: #f59e0b;
             --error-color: #f87171;
             --shadow-color: rgba(0,0,0,0.4);
             --logo-border: rgba(255,255,255,0.1);
@@ -206,7 +207,7 @@
         .tooltip-text {
             visibility: hidden; width: 220px; background-color: var(--bg-color); color: var(--text-primary);
             text-align: center; border-radius: 6px; padding: 8px; position: absolute;
-            z-index: 1; bottom: 125%; left: 50%; margin-left: -110px;
+            z-index: 10; bottom: 125%; left: 50%; margin-left: -110px;
             opacity: 0; transition: opacity 0.3s; border: 1px solid var(--border-color);
             box-shadow: 0 5px 15px var(--shadow-color); font-size: 12px; text-transform: none;
         }
@@ -223,8 +224,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            margin-top: 30px; 
         }
-        .scenario-manager .actions {
+        .scenario-manager .actions, .scenario-manager .backup-actions {
             display: flex;
             gap: 10px;
             width: 100%;
@@ -233,9 +235,54 @@
             margin-bottom: 5px;
         }
         .scenario-manager select { flex-grow: 1; }
-        .scenario-manager button { width: auto; padding: 10px 15px; }
-        #saveScenarioBtn { background-color: var(--accent-green); border-color: var(--accent-green); color: #fff;}
-        #deleteScenarioBtn { background-color: var(--error-color); border-color: var(--error-color); color: #fff;}
+        .scenario-manager button, .info-btn { 
+            width: auto; 
+            padding: 10px 15px;
+        }
+        
+        #saveScenarioBtn { 
+            background-color: var(--accent-green); 
+            border-color: var(--accent-green); 
+            color: #fff;
+            flex-grow: 2;
+        }
+        #deleteScenarioBtn { 
+            background-color: var(--error-color); 
+            border-color: var(--error-color); 
+            color: #fff;
+            flex-grow: 1;
+        }
+        #exportScenariosBtn, #importScenariosBtn { 
+            background-color: var(--input-bg); 
+            border-color: var(--input-border); 
+            color: var(--text-secondary); 
+            flex-grow: 1;
+        }
+        
+        .info-btn {
+            position: relative;
+            background-color: var(--accent-yellow) !important;
+            border-color: var(--accent-yellow) !important;
+            color: #fff !important;
+            flex-grow: 1;
+            /* DODANO: Wyśrodkowanie zawartości */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .info-btn .tooltip-text {
+            width: 280px;
+            left: auto;
+            right: 0;
+            margin-left: 0;
+            text-align: left;
+            line-height: 1.4;
+        }
+        .info-btn:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
 
         .chart-container {
             grid-column: 1 / -1;
@@ -245,6 +292,40 @@
             border-radius: 8px;
         }
 
+        #undo-toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--input-group-bg);
+            color: var(--text-primary);
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            font-size: 16px;
+            box-shadow: 0 5px 20px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0;
+            transition: visibility 0.5s, opacity 0.5s, bottom 0.5s;
+        }
+        #undo-toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        #undo-toast button {
+            width: auto;
+            padding: 8px 12px;
+            font-weight: bold;
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
 
         @media (max-width: 800px) {
             .main-grid { grid-template-columns: 1fr; }
@@ -252,6 +333,7 @@
             .result-value { text-align: left; }
             .header-container { flex-direction: column; }
             .theme-switcher { position: static; margin-top: 15px; }
+            .scenario-manager .actions { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -347,6 +429,14 @@
                     <div class="actions">
                         <button id="saveScenarioBtn">💾 Zapisz</button>
                         <button id="deleteScenarioBtn">🗑️ Usuń</button>
+                        <div class="info-btn">⚠️ Ważne!
+                            <span class="tooltip-text">Scenariusze są zapisywane w pamięci lokalnej Twojej przeglądarki (localStorage). Nie zostaną usunięte przez standardowe czyszczenie ciasteczek, ale znikną, jeśli wyczyścisz "dane witryn" dla tej strony.</span>
+                        </div>
+                    </div>
+                    <div class="backup-actions">
+                        <button id="exportScenariosBtn">Eksportuj</button>
+                        <button id="importScenariosBtn">Importuj</button>
+                        <input type="file" id="importFileInput" style="display: none;" accept=".json">
                     </div>
                 </div>
             </div>
@@ -355,6 +445,11 @@
                 <canvas id="capitalChart"></canvas>
             </div>
         </div>
+    </div>
+
+    <div id="undo-toast">
+        <span id="undo-message"></span>
+        <button id="undo-btn">Cofnij</button>
     </div>
 </div>
 
@@ -371,7 +466,11 @@
 
     const formatCurrency = (value) => (value || 0).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
     const getValue = (id) => parseFloat(document.getElementById(id).value) || 0;
-    let capitalChart = null; // Zmienna globalna przechowująca instancję wykresu
+    let capitalChart = null; 
+
+    // --- UNDO DELETE ---
+    let recentlyDeleted = null;
+    let undoTimeout = null;
 
     function getWiborForDate(date) {
         let closestDate = null;
@@ -416,11 +515,11 @@
             capitalChart.destroy();
         }
         capitalChart = new Chart(ctx, {
-            type: 'bar', // Zmiana na bar, żeby poprawnie mieszać typy
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    type: 'line', // Ten dataset będzie linią
+                    type: 'line',
                     label: 'Pozostały kapitał',
                     data: capitalData,
                     borderColor: 'rgb(52, 211, 153)',
@@ -430,7 +529,7 @@
                     pointRadius: 0,
                     yAxisID: 'yCapital',
                 },{
-                    type: 'bar', // Ten dataset będzie słupkami
+                    type: 'bar',
                     label: 'Miesięczne odsetki',
                     data: interestData,
                     backgroundColor: 'rgba(96, 165, 250, 0.5)',
@@ -455,7 +554,7 @@
                         position: 'right',
                         beginAtZero: true,
                         ticks: { color: textColor },
-                        grid: { drawOnChartArea: false }, // Tylko jedna siatka główna
+                        grid: { drawOnChartArea: false },
                         title: { display: true, text: 'Odsetki (PLN)', color: textColor }
                     },
                     x: {
@@ -511,7 +610,7 @@
         
         const chartLabels = [dataPodpisania.toLocaleDateString('sv')];
         const chartCapitalData = [pozostalyKapital];
-        const chartInterestData = [0]; // Zaczynamy od zera odsetek na start
+        const chartInterestData = [0];
 
         if (P_financed > 0) {
             while(currentDate < effectiveEndDate && miesiaceSplacone < n_total) {
@@ -603,28 +702,16 @@
         return JSON.parse(localStorage.getItem(SCENARIOS_KEY)) || [];
     }
 
-    function saveScenario(name, data) {
-        const scenarios = getScenarios();
-        const existingIndex = scenarios.findIndex(s => s.name === name);
-        if (existingIndex > -1) {
-            scenarios[existingIndex] = data; // Update
-        } else {
-            scenarios.push(data); // Add new
-        }
+    function saveScenarios(scenarios) {
         localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
     }
 
-    function deleteScenario(name) {
-        let scenarios = getScenarios();
-        scenarios = scenarios.filter(s => s.name !== name);
-        localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
-    }
-
-    function populateScenariosDropdown() {
-        const scenarios = getScenarios();
+    function populateScenariosDropdown(excludeName = null) {
+        const scenarios = getScenarios().filter(s => !excludeName || s.name !== excludeName);
         scenarios.sort((a, b) => a.name.localeCompare(b.name, 'pl', { sensitivity: 'base' }));
 
         const dropdown = document.getElementById('scenariosDropdown');
+        const currentValue = dropdown.value;
         dropdown.innerHTML = '<option value="">Wczytaj scenariusz...</option>';
         scenarios.forEach(s => {
             const option = document.createElement('option');
@@ -632,6 +719,7 @@
             option.textContent = s.name;
             dropdown.appendChild(option);
         });
+        dropdown.value = currentValue;
     }
 
     function collectFormData(name) {
@@ -694,6 +782,50 @@
         });
     }
 
+    function exportScenarios() {
+        const scenarios = getScenarios();
+        if (scenarios.length === 0) {
+            alert("Brak scenariuszy do wyeksportowania.");
+            return;
+        }
+        const dataStr = JSON.stringify(scenarios, null, 2);
+        const dataBlob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'scenariusze-wps.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const scenarios = JSON.parse(e.target.result);
+                if (Array.isArray(scenarios) && scenarios.every(s => 'name' in s)) {
+                    if (confirm("Zaimportowanie scenariuszy nadpisze wszystkie obecne. Czy kontynuować?")) {
+                        saveScenarios(scenarios);
+                        populateScenariosDropdown();
+                        alert(`Zaimportowano pomyślnie ${scenarios.length} scenariuszy.`);
+                    }
+                } else {
+                    throw new Error("Nieprawidłowy format pliku.");
+                }
+            } catch (error) {
+                alert("Błąd podczas importowania pliku. Upewnij się, że plik jest prawidłowy.");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // --- Event Listeners and Initial Setup ---
     document.addEventListener('DOMContentLoaded', () => {
         const themeToggle = document.getElementById('themeToggle');
         if (localStorage.getItem('theme') === 'light') {
@@ -703,13 +835,8 @@
             themeToggle.checked = true;
         }
         themeToggle.addEventListener('change', () => {
-            if (themeToggle.checked) {
-                document.body.classList.remove('light-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.add('light-mode');
-                localStorage.setItem('theme', 'light');
-            }
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             calculateWPS();
         });
 
@@ -731,27 +858,59 @@
         document.getElementById('saveScenarioBtn').addEventListener('click', () => {
             const name = prompt("Podaj nazwę dla zapisu scenariusza:", "");
             if (name && name.trim() !== '') {
+                const scenarios = getScenarios();
+                if (scenarios.some(s => s.name === name.trim())) {
+                    if (!confirm(`Scenariusz o nazwie "${name.trim()}" już istnieje. Czy chcesz go nadpisać?`)) {
+                        return;
+                    }
+                }
                 const data = collectFormData(name.trim());
-                saveScenario(name.trim(), data);
+                saveScenarios(scenarios.filter(s => s.name !== name.trim()).concat(data));
                 populateScenariosDropdown();
+                document.getElementById('scenariosDropdown').value = name.trim();
                 alert(`Scenariusz "${name.trim()}" został zapisany!`);
             }
         });
         
         document.getElementById('scenariosDropdown').addEventListener('change', function() {
             if (!this.value) return;
-            const scenarios = getScenarios();
-            const scenario = scenarios.find(s => s.name === this.value);
+            const scenario = getScenarios().find(s => s.name === this.value);
             if (scenario) applyScenario(scenario);
         });
 
         document.getElementById('deleteScenarioBtn').addEventListener('click', () => {
             const dropdown = document.getElementById('scenariosDropdown');
             const name = dropdown.value;
-            if (name && confirm(`Czy na pewno chcesz usunąć scenariusz "${name}"?`)) {
-                deleteScenario(name);
+            if (!name) return;
+            if (confirm(`Czy na pewno chcesz usunąć scenariusz "${name}"?`)) {
+                const scenarios = getScenarios();
+                recentlyDeleted = scenarios.find(s => s.name === name);
+                const updatedScenarios = scenarios.filter(s => s.name !== name);
+                saveScenarios(updatedScenarios);
                 populateScenariosDropdown();
-                alert(`Scenariusz "${name}" został usunięty.`);
+                
+                const toast = document.getElementById('undo-toast');
+                document.getElementById('undo-message').textContent = `Usunięto "${name}".`;
+                toast.classList.add('show');
+                clearTimeout(undoTimeout);
+                undoTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                    recentlyDeleted = null;
+                }, 7000);
+            }
+        });
+        
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            if (recentlyDeleted) {
+                const scenarios = getScenarios();
+                scenarios.push(recentlyDeleted);
+                saveScenarios(scenarios);
+                populateScenariosDropdown();
+                document.getElementById('scenariosDropdown').value = recentlyDeleted.name;
+                
+                recentlyDeleted = null;
+                clearTimeout(undoTimeout);
+                document.getElementById('undo-toast').classList.remove('show');
             }
         });
         
@@ -764,6 +923,10 @@
                 option.style.display = text.includes(filter) ? '' : 'none';
             });
         });
+        
+        document.getElementById('exportScenariosBtn').addEventListener('click', exportScenarios);
+        document.getElementById('importScenariosBtn').addEventListener('click', () => document.getElementById('importFileInput').click());
+        document.getElementById('importFileInput').addEventListener('change', handleFileImport);
 
         document.getElementById('dataSymulacji').value = new Date().toISOString().split('T')[0];
         populateScenariosDropdown();
