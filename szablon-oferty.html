@@ -34,30 +34,8 @@
         .roi-card .label { font-size: 1.1rem; color: #9ca3af; }
         .roi-card .value { font-size: 2.5rem; font-weight: 900; color: #60a5fa; margin: 8px 0; }
         .roi-card .sub-text { font-size: 1rem; color: #d1d5db; }
-        /* NOWE STYLE DLA KAFELKÓW PROCESU */
-        .step-card {
-            background-color: #112240;
-            border: 1px solid #374151;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .step-icon {
-            width: 64px;
-            height: 64px;
-            background-color: #1f2937;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin-bottom: 16px;
-            border: 2px solid #FFC107;
-            color: white;
-        }
+        .step-card { background-color: #112240; border: 1px solid #374151; border-radius: 8px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .step-icon { width: 64px; height: 64px; background-color: #1f2937; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 16px; border: 2px solid #FFC107; color: white; }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -96,9 +74,10 @@
 
         <section id="summary-panel" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
             <div class="max-w-md mx-auto mb-8">
-                <label for="durationSlider" class="block text-center text-2xl font-bold text-white mb-3">
+                <label for="durationSlider" class="block text-center text-2xl font-bold text-white mb-2">
                     Przewidywany czas trwania procesu: <span id="durationValue" class="text-[#FFC107]">12 miesięcy</span>
                 </label>
+                <p class="text-center text-gray-400 mb-4 text-sm">Przesuń suwakiem, aby sprawdzić zmiany w korzyściach!</p>
                 <input type="range" id="durationSlider" min="3" max="36" value="12" class="w-full">
             </div>
 
