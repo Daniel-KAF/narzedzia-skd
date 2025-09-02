@@ -6,6 +6,7 @@
     <title>Propozycja Współpracy - SKD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -22,36 +23,17 @@
         .summary-table .total-row td { border-top: 2px solid #FFC107; padding-top: 15px; font-size: 1.25rem; font-weight: 900; }
         .summary-table .total-row .label { color: white; }
         .summary-table .total-row .amount { color: #FFC107; }
-        /* Style dla suwaka */
         input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #374151; border-radius: 4px; outline: none; transition: opacity .2s; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
         input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
-        /* Style dla kafelków rat */
-        .installment-option { 
-            background-color: #0A192F; 
-            border: 1px solid #374151; 
-            border-radius: 8px; 
-            padding: 16px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: all 0.2s ease-in-out;
-            cursor: default;
-        }
-        .installment-option:hover {
-            transform: translateY(-3px);
-            border-color: #60a5fa;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-        }
-        .installment-option .term { 
-            font-size: 1.75rem; /* text-3xl */
-            font-weight: 800; /* font-extrabold */
-            color: white; 
-            margin-bottom: 8px; /* mb-2 */
-        }
-        .installment-option .value { 
-            font-size: 1.5rem; /* text-2xl */
-            font-weight: 700; /* font-bold */
-            color: #34d399; /* text-green-400 */
-        }
+        .installment-option { background-color: #0A192F; border: 1px solid #374151; border-radius: 8px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s ease-in-out; cursor: default; }
+        .installment-option:hover { transform: translateY(-3px); border-color: #60a5fa; box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+        .installment-option .term { font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 8px; }
+        .installment-option .value { font-size: 1.5rem; font-weight: 700; color: #34d399; }
+        .roi-card { background-color: #1f2937; border: 2px solid #60a5fa; border-radius: 8px; padding: 20px; text-align: center; }
+        .roi-card .label { font-size: 1.1rem; color: #9ca3af; }
+        .roi-card .value { font-size: 2.5rem; font-weight: 900; color: #60a5fa; margin: 8px 0; }
+        .roi-card .sub-text { font-size: 1rem; color: #d1d5db; }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -74,36 +56,23 @@
 
             <table class="summary-table max-w-2xl mx-auto">
                 <tbody>
-                    <tr>
-                        <td class="label">Zwrot kapitału (WPS)</td>
-                        <td class="amount green-text" id="calc-wps"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Naliczone odsetki karne</td>
-                        <td class="amount green-text" id="calc-interest"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Dodatkowa korzyść (Oszczędność na ratach)</td>
-                        <td class="amount green-text" id="calc-savings"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Koszty na start (Opłata wstępna)</td>
-                        <td class="amount red-text" id="calc-upfront-fee"></td>
-                    </tr>
-                    <tr>
-                        <td class="label">Opłata za ewentualną II instancję</td>
-                        <td class="amount red-text">- 922,50 zł</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Success Fee (prowizja od sukcesu)</td>
-                        <td class="amount red-text" id="calc-success-fee"></td>
-                    </tr>
-                    <tr class="total-row">
-                        <td class="label">ZYSK NA CZYSTO</td>
-                        <td class="amount" id="calc-net-profit"></td>
-                    </tr>
+                    <tr><td class="label">Zwrot kapitału (WPS)</td><td class="amount green-text" id="calc-wps"></td></tr>
+                    <tr><td class="label">Naliczone odsetki karne</td><td class="amount green-text" id="calc-interest"></td></tr>
+                    <tr><td class="label">Dodatkowa korzyść (Oszczędność na ratach)</td><td class="amount green-text" id="calc-savings"></td></tr>
+                    <tr><td class="label">Koszty na start (Opłata wstępna)</td><td class="amount red-text" id="calc-upfront-fee"></td></tr>
+                    <tr><td class="label">Opłata za ewentualną II instancję</td><td class="amount red-text">- 922,50 zł</td></tr>
+                    <tr><td class="label">Success Fee (prowizja od sukcesu)</td><td class="amount red-text" id="calc-success-fee"></td></tr>
+                    <tr class="total-row"><td class="label">ZYSK NA CZYSTO</td><td class="amount" id="calc-net-profit"></td></tr>
                 </tbody>
             </table>
+        </section>
+
+        <section id="roi-section" class="mb-8">
+            <div class="roi-card max-w-md mx-auto">
+                <p class="label">Stopa zwrotu z inwestycji (ROI)</p>
+                <p class="value" id="roi-percentage">0%</p>
+                <p class="sub-text" id="roi-text">Każda zainwestowana złotówka to...</p>
+            </div>
         </section>
 
         <section id="chart-section" class="bg-[#112240] rounded-lg shadow-lg p-6 md:p-8 border border-gray-700 mb-8">
@@ -115,18 +84,9 @@
              <h3 class="text-2xl font-bold text-center text-white mb-4">Elastyczne finansowanie</h3>
              <p class="text-center text-gray-400 mb-6">Opłatę wstępną <span class="font-bold text-white" id="upfront-fee-val-installments"></span> można rozłożyć na raty 0%:</p>
              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center max-w-xl mx-auto">
-                <div class="installment-option">
-                    <p class="term">5x</p>
-                    <p class="value"><span id="installment-5"></span></p>
-                </div>
-                <div class="installment-option">
-                    <p class="term">10x</p>
-                    <p class="value"><span id="installment-10"></span></p>
-                </div>
-                <div class="installment-option">
-                    <p class="term">20x</p>
-                    <p class="value"><span id="installment-20"></span></p>
-                </div>
+                <div class="installment-option"><p class="term">5x</p><p class="value"><span id="installment-5"></span></p></div>
+                <div class="installment-option"><p class="term">10x</p><p class="value"><span id="installment-10"></span></p></div>
+                <div class="installment-option"><p class="term">20x</p><p class="value"><span id="installment-20"></span></p></div>
              </div>
         </section>
 
@@ -139,6 +99,27 @@
     <script>
         const formatCurrency = (value) => value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN', minimumFractionDigits: 2 });
         let investmentChart;
+        let currentValues = {}; 
+
+        const animateValue = (element, endValue, isCurrency = true, suffix = '') => {
+            const key = element.id;
+            const startValue = currentValues[key] || 0;
+            if (startValue === endValue) return;
+
+            const dummy = { value: startValue };
+            anime({
+                targets: dummy,
+                value: endValue,
+                duration: 600,
+                easing: 'easeOutCubic',
+                update: () => {
+                    element.textContent = isCurrency ? formatCurrency(dummy.value) : `${dummy.value.toFixed(0)}${suffix}`;
+                },
+                complete: () => {
+                    currentValues[key] = endValue;
+                }
+            });
+        };
 
         function initializeChart() {
             const ctx = document.getElementById('investmentVsProfitChart').getContext('2d');
@@ -160,30 +141,37 @@
             const durationMonths = parseInt(durationSlider.value);
             document.getElementById('durationValue').textContent = `${durationMonths} miesi${durationMonths === 1 ? 'ąc' : (durationMonths < 5 ? 'ące' : 'ęcy')}`;
 
-
             const annualInterestRate = 0.105;
             const fee2ndInstance = 922.50; 
             
             const interestTotal = wps * (annualInterestRate / 12) * durationMonths;
             const clientGrossProfit = wps + interestTotal + savings;
             const successFeeAmount = clientGrossProfit * successFeePerc;
-            
             const clientNetProfit = clientGrossProfit - successFeeAmount - upfrontFee - fee2ndInstance;
             
+            animateValue(document.getElementById('calc-wps'), wps);
             document.getElementById('calc-wps').textContent = "+ " + formatCurrency(wps);
+            animateValue(document.getElementById('calc-interest'), interestTotal);
             document.getElementById('calc-interest').textContent = "+ " + formatCurrency(interestTotal);
             document.getElementById('calc-savings').textContent = "+ " + formatCurrency(savings);
             document.getElementById('calc-upfront-fee').textContent = "- " + formatCurrency(upfrontFee);
+            animateValue(document.getElementById('calc-success-fee'), successFeeAmount);
             document.getElementById('calc-success-fee').textContent = "- " + formatCurrency(successFeeAmount);
-            document.getElementById('calc-net-profit').textContent = formatCurrency(clientNetProfit);
+            animateValue(document.getElementById('calc-net-profit'), clientNetProfit);
+
+            const totalUpfrontInvestmentForRoi = upfrontFee + fee2ndInstance;
+            const roiPercentage = totalUpfrontInvestmentForRoi > 0 ? (clientNetProfit / totalUpfrontInvestmentForRoi) * 100 : 0;
+            const roiTextValue = totalUpfrontInvestmentForRoi > 0 ? (clientNetProfit / totalUpfrontInvestmentForRoi) : 0;
+            animateValue(document.getElementById('roi-percentage'), roiPercentage, false, '%');
+            document.getElementById('roi-text').textContent = `Każda zainwestowana złotówka przynosi ${roiTextValue.toFixed(2).replace('.',',')} zł zysku.`;
 
             document.getElementById('upfront-fee-val-installments').textContent = formatCurrency(upfrontFee);
             document.getElementById('installment-5').textContent = formatCurrency(upfrontFee / 5);
             document.getElementById('installment-10').textContent = formatCurrency(upfrontFee / 10);
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
             
-            const totalUpfrontInvestment = upfrontFee + fee2ndInstance;
-            investmentChart.data.datasets[0].data = [totalUpfrontInvestment, clientNetProfit > 0 ? clientNetProfit : 0];
+            // ZMIANA WPROWADZONA TUTAJ
+            investmentChart.data.datasets[0].data = [upfrontFee, clientNetProfit > 0 ? clientNetProfit : 0];
             investmentChart.update();
         }
 
