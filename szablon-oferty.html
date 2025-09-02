@@ -26,6 +26,32 @@
         input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; background: #374151; border-radius: 4px; outline: none; transition: opacity .2s; }
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
         input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; background: #FFC107; cursor: pointer; border-radius: 50%; }
+        /* Style dla kafelków rat */
+        .installment-option { 
+            background-color: #0A192F; 
+            border: 1px solid #374151; 
+            border-radius: 8px; 
+            padding: 16px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
+            cursor: default;
+        }
+        .installment-option:hover {
+            transform: translateY(-3px);
+            border-color: #60a5fa;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        }
+        .installment-option .term { 
+            font-size: 1.75rem; /* text-3xl */
+            font-weight: 800; /* font-extrabold */
+            color: white; 
+            margin-bottom: 8px; /* mb-2 */
+        }
+        .installment-option .value { 
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            color: #34d399; /* text-green-400 */
+        }
     </style>
 </head>
 <body class="bg-[#0A192F] text-[#CCD6F6]">
@@ -69,7 +95,7 @@
                         <td class="amount red-text">- 922,50 zł</td>
                     </tr>
                     <tr>
-                        <td class="label">Success Fee Kancelarii (prowizja od sukcesu)</td>
+                        <td class="label">Success Fee (prowizja od sukcesu)</td>
                         <td class="amount red-text" id="calc-success-fee"></td>
                     </tr>
                     <tr class="total-row">
@@ -87,11 +113,20 @@
         
         <section id="installments" class="bg-[#112240] rounded-lg p-6 border border-gray-700 mb-8">
              <h3 class="text-2xl font-bold text-center text-white mb-4">Elastyczne finansowanie</h3>
-             <p class="text-center text-gray-400 mb-4">Opłatę wstępną <span class="font-bold text-white" id="upfront-fee-val-installments"></span> można rozłożyć na raty 0%:</p>
-             <div class="flex justify-center gap-4 text-center">
-                <div class="flex-1"><p class="font-bold text-lg text-white">5x</p><p class="text-[#FFC107] font-semibold"><span id="installment-5"></span></p></div>
-                <div class="flex-1"><p class="font-bold text-lg text-white">10x</p><p class="text-[#FFC107] font-semibold"><span id="installment-10"></span></p></div>
-                <div class="flex-1"><p class="font-bold text-lg text-white">20x</p><p class="text-[#FFC107] font-semibold"><span id="installment-20"></span></p></div>
+             <p class="text-center text-gray-400 mb-6">Opłatę wstępną <span class="font-bold text-white" id="upfront-fee-val-installments"></span> można rozłożyć na raty 0%:</p>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center max-w-xl mx-auto">
+                <div class="installment-option">
+                    <p class="term">5x</p>
+                    <p class="value"><span id="installment-5"></span></p>
+                </div>
+                <div class="installment-option">
+                    <p class="term">10x</p>
+                    <p class="value"><span id="installment-10"></span></p>
+                </div>
+                <div class="installment-option">
+                    <p class="term">20x</p>
+                    <p class="value"><span id="installment-20"></span></p>
+                </div>
              </div>
         </section>
 
@@ -121,24 +156,20 @@
             const upfrontFee = parseFloat(params.get('upfrontFee')) || 0;
             const successFeePerc = parseFloat(params.get('successFee')) / 100 || 0;
             
-            // Pobieranie wartości z nowego suwaka
             const durationSlider = document.getElementById('durationSlider');
             const durationMonths = parseInt(durationSlider.value);
             document.getElementById('durationValue').textContent = `${durationMonths} miesi${durationMonths === 1 ? 'ąc' : (durationMonths < 5 ? 'ące' : 'ęcy')}`;
 
 
             const annualInterestRate = 0.105;
-            const fee2ndInstance = 922.50; // Stała opłata za II instancję
+            const fee2ndInstance = 922.50; 
             
-            // Dynamiczne obliczenia na podstawie suwaka
             const interestTotal = wps * (annualInterestRate / 12) * durationMonths;
-            const clientGrossProfit = wps + interestTotal + savings; // To jest "Suma korzyści"
+            const clientGrossProfit = wps + interestTotal + savings;
             const successFeeAmount = clientGrossProfit * successFeePerc;
             
-            // Końcowy zysk netto z uwzględnieniem nowej opłaty
             const clientNetProfit = clientGrossProfit - successFeeAmount - upfrontFee - fee2ndInstance;
             
-            // Aktualizacja nowej, rozbitej tabeli
             document.getElementById('calc-wps').textContent = "+ " + formatCurrency(wps);
             document.getElementById('calc-interest').textContent = "+ " + formatCurrency(interestTotal);
             document.getElementById('calc-savings').textContent = "+ " + formatCurrency(savings);
@@ -146,13 +177,11 @@
             document.getElementById('calc-success-fee').textContent = "- " + formatCurrency(successFeeAmount);
             document.getElementById('calc-net-profit').textContent = formatCurrency(clientNetProfit);
 
-            // Aktualizacja sekcji ratalnej
             document.getElementById('upfront-fee-val-installments').textContent = formatCurrency(upfrontFee);
             document.getElementById('installment-5').textContent = formatCurrency(upfrontFee / 5);
             document.getElementById('installment-10').textContent = formatCurrency(upfrontFee / 10);
             document.getElementById('installment-20').textContent = formatCurrency(upfrontFee / 20);
             
-            // Aktualizacja wykresu
             const totalUpfrontInvestment = upfrontFee + fee2ndInstance;
             investmentChart.data.datasets[0].data = [totalUpfrontInvestment, clientNetProfit > 0 ? clientNetProfit : 0];
             investmentChart.update();
@@ -167,11 +196,10 @@
             
             initializeChart();
             
-            // Event listener dla nowego suwaka
             const durationSlider = document.getElementById('durationSlider');
             durationSlider.addEventListener('input', updateDisplay);
 
-            updateDisplay(); // Wywołanie na starcie
+            updateDisplay(); 
         });
     </script>
 </body>
