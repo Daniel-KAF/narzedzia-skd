@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Narzędzia KAF</title>
     <style>
-        /* Resetowanie domyślnych stylów */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -21,11 +20,10 @@
         }
 
         #app-container {
-            display: none; /* Zmienione na 'flex' po podaniu hasła */
+            display: none;
             height: 100vh;
         }
 
-        /* Panel boczny (menu) */
         .sidebar {
             width: 260px;
             background-color: #424242;
@@ -52,35 +50,55 @@
             font-size: 16px;
             font-weight: bold;
             color: white;
-            background-color: #555;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
             transition: background-color 0.2s, transform 0.1s;
             text-align: left;
+            margin-bottom: 10px;
         }
-
-        .nav-button:hover {
-            background-color: #666;
+        
+        .nav-button:last-child {
+            margin-bottom: 0;
         }
 
         .nav-button.active {
-            background-color: #0288d1;
             transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
+        
+        .btn-calculator { background-color: #4caf50; }
+        .btn-calculator:hover { background-color: #45a049; }
+        .btn-generator { background-color: #0288d1; }
+        .btn-generator:hover { background-color: #0277bd; }
+        .btn-wps { background-color: #f57c00; }
+        .btn-wps:hover { background-color: #e65100; }
+        .btn-loan { background-color: #673ab7; }
+        .btn-loan:hover { background-color: #512da8; }
+        .btn-sim { background-color: #009688; }
+        .btn-sim:hover { background-color: #00796b; }
+        .btn-analysis { background-color: #e91e63; }
+        .btn-analysis:hover { background-color: #c2185b; }
 
-        /* Główny obszar na treść */
         #content-area {
             flex-grow: 1;
-            /* Usunięto padding, aby ramka wypełniała całą przestrzeń */
+            position: relative; /* Potrzebne do pozycjonowania ramek */
         }
 
-        /* Styl dla ramki, w której będą wyświetlane narzędzia */
-        #tool-frame {
+        /* ZMIANA: Style dla ramek (iframe) */
+        .tool-frame {
             width: 100%;
             height: 100%;
-            border: none; /* Usuwa domyślną ramkę wokół iframe */
+            border: none;
+            position: absolute; /* Wszystkie ramki są w tym samym miejscu */
+            top: 0;
+            left: 0;
+            display: none; /* Domyślnie wszystkie są ukryte */
+        }
+
+        .tool-frame.active {
+            display: block; /* Pokazujemy tylko aktywną ramkę */
         }
     </style>
 </head>
@@ -90,22 +108,19 @@
         <nav class="sidebar">
             <div>
                 <h1>SKD</h1>
-                <a href="kalkulator_wps.html" class="nav-button" target="tool-frame">Kalkulator WPS</a>
-                <a href="analiza_umowy.html" class="nav-button" target="tool-frame">Analiza Umowy</a>
-                <a href="kalkulator_zysku.html" class="nav-button" target="tool-frame">Kalkulator Zysku</a>
-                <a href="generator_ofert.html" class="nav-button" target="tool-frame">Generator Ofert</a>
+                <a href="#" class="nav-button btn-wps" data-page="kalkulator_wps.html">Kalkulator WPS</a>
+                <a href="#" class="nav-button btn-analysis" data-page="analiza_umowy.html">Analiza Umowy</a>
+                <a href="#" class="nav-button btn-calculator" data-page="kalkulator_zysku.html">Kalkulator Zysku</a>
+                <a href="#" class="nav-button btn-generator" data-page="generator_ofert.html">Generator Ofert</a>
             </div>
             <div>
                 <h1>Kredyty</h1>
-                <a href="kalkulator_kredytowy.html" class="nav-button" target="tool-frame">Kalkulator Kredytowy</a>
-                <a href="symulacje_klienta.html" class="nav-button" target="tool-frame">Symulacje dla Klienta</a>
+                <a href="#" class="nav-button btn-loan" data-page="kalkulator_kredytowy.html">Kalkulator Kredytowy</a>
+                <a href="#" class="nav-button btn-sim" data-page="symulacje_klienta.html">Symulacje dla Klienta</a>
             </div>
         </nav>
 
-        <main id="content-area">
-            <iframe name="tool-frame" id="tool-frame" title="Narzędzie KAF">
-                </iframe>
-        </main>
+        <main id="content-area"></main>
     </div>
 
     <script>
@@ -121,16 +136,42 @@
             }
         })();
 
-        // === UPROSZCZONA LOGIKA DO PODŚWIETLANIA AKTYWNEGO PRZYCISKU ===
+        // === NOWA, ZAAWANSOWANA LOGIKA POKAZYWANIA I UKRYWANIA RAMEK ===
         document.addEventListener('DOMContentLoaded', () => {
             const navButtons = document.querySelectorAll('.nav-button');
+            const contentArea = document.getElementById('content-area');
 
             navButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Usuwamy klasę 'active' ze wszystkich przycisków
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // Blokujemy domyślną akcję linku
+
+                    const pageUrl = button.getAttribute('data-page');
+                    if (!pageUrl) return;
+
+                    // Podświetlanie aktywnego przycisku w menu
                     navButtons.forEach(btn => btn.classList.remove('active'));
-                    // Dodajemy klasę 'active' tylko do klikniętego przycisku
                     button.classList.add('active');
+
+                    // Ukrywanie wszystkich istniejących ramek
+                    document.querySelectorAll('.tool-frame').forEach(frame => {
+                        frame.classList.remove('active');
+                    });
+
+                    // Sprawdzanie, czy ramka dla tego narzędzia już istnieje
+                    let frame = document.getElementById(pageUrl);
+
+                    if (frame) {
+                        // Jeśli ramka istnieje, po prostu ją pokaż
+                        frame.classList.add('active');
+                    } else {
+                        // Jeśli ramka nie istnieje, stwórz ją, załaduj i pokaż
+                        frame = document.createElement('iframe');
+                        frame.id = pageUrl; // Używamy URL jako unikalnego ID
+                        frame.className = 'tool-frame active'; // Nadajemy klasy, w tym 'active' by była widoczna
+                        frame.src = pageUrl;
+                        
+                        contentArea.appendChild(frame); // Dodajemy nową ramkę do kontenera
+                    }
                 });
             });
         });
