@@ -5,108 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Narzędzia KAF</title>
     <style>
+        /* Resetowanie domyślnych stylów */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #333;
             color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            margin: 0;
-            text-align: center;
+            overflow: hidden; /* Zapobiega przewijaniu całej strony */
         }
-        .main-container {
-            display: none; /* Ukrywamy domyślnie kontener z przyciskami */
-            gap: 40px;
-            padding: 40px;
+
+        /* Główny kontener aplikacji, domyślnie ukryty do czasu podania hasła */
+        #app-container {
+            display: none; /* Zmienione na 'flex' po podaniu hasła */
+            height: 100vh;
+        }
+
+        /* Panel boczny (menu) */
+        .sidebar {
+            width: 260px;
             background-color: #424242;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        .tool-column {
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 25px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            overflow-y: auto; /* Umożliwia przewijanie menu, jeśli jest długie */
         }
-        h1 {
+
+        .sidebar h1 {
+            font-size: 22px;
             color: #e0e0e0;
-            margin-top: 0;
-            margin-bottom: 30px;
-            font-size: 24px;
             border-bottom: 2px solid #555;
             padding-bottom: 10px;
-            width: 100%;
+            margin-bottom: 5px;
         }
-        .button-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .button {
+
+        .nav-button {
             display: block;
-            padding: 15px 30px;
-            font-size: 18px;
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
+            background-color: #555;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.2s;
-            min-width: 250px;
+            transition: background-color 0.2s, transform 0.1s;
+            text-align: left;
         }
-        .btn-calculator { background-color: #4caf50; }
-        .btn-calculator:hover { background-color: #45a049; }
-        .btn-generator { background-color: #0288d1; }
-        .btn-generator:hover { background-color: #0277bd; }
-        .btn-wps { background-color: #f57c00; }
-        .btn-wps:hover { background-color: #e65100; }
-        .btn-loan { background-color: #673ab7; }
-        .btn-loan:hover { background-color: #512da8; }
-        .btn-sim { background-color: #009688; }
-        .btn-sim:hover { background-color: #00796b; }
-        .btn-analysis { background-color: #e91e63; }
-        .btn-analysis:hover { background-color: #c2185b; }
+
+        .nav-button:hover {
+            background-color: #666;
+        }
+
+        .nav-button.active {
+            background-color: #0288d1; /* Kolor aktywnego przycisku */
+            transform: scale(1.02);
+        }
+
+        /* Główny obszar na treść */
+        #content-area {
+            flex-grow: 1; /* Zajmuje pozostałą dostępną przestrzeń */
+            padding: 30px;
+            overflow-y: auto; /* Umożliwia przewijanie treści, jeśli jest długa */
+        }
+        
+        /* Styl dla początkowego komunikatu */
+        .welcome-message {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            font-size: 1.5em;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
-    <div class="main-container" id="mainContent">
-        <div class="tool-column">
-            <h1>SKD</h1>
-            <div class="button-wrapper">
-                <a href="kalkulator_wps.html" class="button btn-wps" target="_blank" rel="noopener noreferrer">Kalkulator WPS</a>
-                <a href="analiza_umowy.html" class="button btn-analysis" target="_blank" rel="noopener noreferrer">Analiza Umowy</a>
-                <a href="kalkulator_zysku.html" class="button btn-calculator" target="_blank" rel="noopener noreferrer">Kalkulator Zysku</a>
-                <a href="generator_ofert.html" class="button btn-generator" target="_blank" rel="noopener noreferrer">Generator Ofert</a>
+
+    <div id="app-container">
+        <nav class="sidebar">
+            <div>
+                <h1>SKD</h1>
+                <a href="#" class="nav-button" data-page="kalkulator_wps.html">Kalkulator WPS</a>
+                <a href="#" class="nav-button" data-page="analiza_umowy.html">Analiza Umowy</a>
+                <a href="#" class="nav-button" data-page="kalkulator_zysku.html">Kalkulator Zysku</a>
+                <a href="#" class="nav-button" data-page="generator_ofert.html">Generator Ofert</a>
             </div>
-        </div>
-        <div class="tool-column">
-            <h1>Kredyty</h1>
-            <div class="button-wrapper">
-                <a href="kalkulator_kredytowy.html" class="button btn-loan" target="_blank" rel="noopener noreferrer">Kalkulator Kredytowy</a>
-                <a href="symulacje_klienta.html" class="button btn-sim" target="_blank" rel="noopener noreferrer">Symulacje dla Klienta</a>
+            <div>
+                <h1>Kredyty</h1>
+                <a href="#" class="nav-button" data-page="kalkulator_kredytowy.html">Kalkulator Kredytowy</a>
+                <a href="#" class="nav-button" data-page="symulacje_klienta.html">Symulacje dla Klienta</a>
             </div>
-        </div>
+        </nav>
+
+        <main id="content-area">
+            <div class="welcome-message">
+                <h2>Witaj w centrum narzędzi KAF</h2>
+                <p>Wybierz narzędzie z menu po lewej stronie, aby rozpocząć.</p>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Ta funkcja uruchomi się automatycznie po załadowaniu strony
+        // === FUNKCJA LOGOWANIA ===
         (function() {
             // ▼▼▼ TUTAJ WPISZ SWOJE HASŁO ▼▼▼
-            const correctPassword = "Kaf999>"; 
+            const correctPassword = "TwojeHaslo123";
             // ▲▲▲ ZMIEŃ POWYŻSZE HASŁO ▲▲▲
 
             let enteredPassword = prompt("Proszę podać hasło, aby uzyskać dostęp:");
 
             if (enteredPassword === correctPassword) {
-                // Jeśli hasło jest poprawne, pokaż główną zawartość
-                document.getElementById("mainContent").style.display = "flex";
+                // Jeśli hasło jest poprawne, pokaż główną aplikację
+                document.getElementById("app-container").style.display = "flex";
             } else {
-                // Jeśli hasło jest niepoprawne, pokaż alert
-                alert("Nieprawidłowe hasło. Odśwież stronę, aby spróbować ponownie.");
+                // Jeśli hasło jest niepoprawne, zablokuj dostęp
+                alert("Nieprawidłowe hasło.");
+                document.body.innerHTML = '<h1 style="text-align:center; margin-top: 50px;">Brak dostępu</h1>';
             }
         })();
+
+        // === LOGIKA ŁADOWANIA TREŚCI ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const contentArea = document.getElementById('content-area');
+            const navButtons = document.querySelectorAll('.nav-button');
+
+            // Funkcja do ładowania i wyświetlania treści z pliku
+            async function loadPage(pageUrl) {
+                try {
+                    const response = await fetch(pageUrl);
+                    if (!response.ok) {
+                        throw new Error(`Nie można załadować strony: ${response.statusText}`);
+                    }
+                    const htmlText = await response.text();
+                    
+                    // Tworzymy tymczasowy dokument, aby wyciągnąć tylko zawartość <body>
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    const newContent = doc.body.innerHTML;
+
+                    contentArea.innerHTML = newContent;
+                } catch (error) {
+                    contentArea.innerHTML = `<p style="color:red;">Błąd ładowania treści: ${error.message}</p>`;
+                    console.error('Błąd:', error);
+                }
+            }
+
+            // Dodajemy obsługę kliknięcia do każdego przycisku w menu
+            navButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // Zapobiega domyślnej akcji linku
+
+                    // Usuwamy klasę 'active' ze wszystkich przycisków
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    // Dodajemy klasę 'active' do klikniętego przycisku
+                    button.classList.add('active');
+
+                    const pageToLoad = button.getAttribute('data-page');
+                    if (pageToLoad) {
+                        loadPage(pageToLoad);
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
