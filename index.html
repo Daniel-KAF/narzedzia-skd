@@ -4,7 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Narzędzia KAF</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
+        /* KROK 3: Definicja kolorów (CSS Variables) dla motywów */
+        :root {
+            --bg-primary: #333;
+            --bg-secondary: #424242;
+            --text-primary: #f0f0f0;
+            --text-secondary: #e0e0e0;
+            --border-color: #555;
+            --shadow-color: rgba(0,0,0,0.5);
+            --active-glow: rgba(255, 255, 255, 0.2);
+        }
+
+        body.light-mode {
+            --bg-primary: #f4f4f4;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #222;
+            --border-color: #ddd;
+            --shadow-color: rgba(0,0,0,0.1);
+            --active-glow: rgba(0, 0, 0, 0.15);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,11 +41,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #333;
-            color: #f0f0f0;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         #app-container {
@@ -26,27 +56,47 @@
 
         .sidebar {
             width: 260px;
-            background-color: #424242;
+            background-color: var(--bg-secondary);
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            box-shadow: 2px 0 10px var(--shadow-color);
             overflow-y: auto;
+            transition: width 0.3s ease;
+        }
+        
+        #app-container.sidebar-collapsed .sidebar {
+            width: 80px;
+            align-items: center;
+        }
+
+        .sidebar-header, .sidebar-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar h1 {
             font-size: 22px;
-            color: #e0e0e0;
-            border-bottom: 2px solid #555;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
             margin-bottom: 5px;
+            white-space: nowrap;
         }
-
+        
+        #app-container.sidebar-collapsed h1,
+        #app-container.sidebar-collapsed .nav-text {
+            display: none;
+        }
+        
         .nav-button {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             width: 100%;
             padding: 12px 15px;
+            margin-bottom: 10px;
             font-size: 16px;
             font-weight: bold;
             color: white;
@@ -55,17 +105,20 @@
             cursor: pointer;
             text-decoration: none;
             transition: background-color 0.2s, transform 0.1s;
-            text-align: left;
-            margin-bottom: 10px;
+            white-space: nowrap;
         }
         
-        .nav-button:last-child {
-            margin-bottom: 0;
+        .nav-button i {
+            font-size: 1.2em;
         }
 
+        #app-container.sidebar-collapsed .nav-button {
+            justify-content: center;
+        }
+        
         .nav-button.active {
             transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px var(--active-glow);
         }
         
         .btn-calculator { background-color: #4caf50; }
@@ -81,24 +134,42 @@
         .btn-analysis { background-color: #e91e63; }
         .btn-analysis:hover { background-color: #c2185b; }
 
-        #content-area {
-            flex-grow: 1;
-            position: relative; /* Potrzebne do pozycjonowania ramek */
+        .sidebar-controls {
+            margin-top: auto; /* Pushes controls to the bottom */
+            padding-top: 20px;
+        }
+        
+        .control-button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .control-button:hover {
+            opacity: 1;
         }
 
-        /* ZMIANA: Style dla ramek (iframe) */
+        #content-area {
+            flex-grow: 1;
+            position: relative;
+        }
+
         .tool-frame {
             width: 100%;
             height: 100%;
             border: none;
-            position: absolute; /* Wszystkie ramki są w tym samym miejscu */
+            position: absolute;
             top: 0;
             left: 0;
-            display: none; /* Domyślnie wszystkie są ukryte */
+            display: none;
         }
 
         .tool-frame.active {
-            display: block; /* Pokazujemy tylko aktywną ramkę */
+            display: block;
         }
     </style>
 </head>
@@ -106,20 +177,43 @@
 
     <div id="app-container">
         <nav class="sidebar">
-            <div>
-                <h1>SKD</h1>
-                <a href="#" class="nav-button btn-wps" data-page="kalkulator_wps.html">Kalkulator WPS</a>
-                <a href="#" class="nav-button btn-analysis" data-page="analiza_umowy.html">Analiza Umowy</a>
-                <a href="#" class="nav-button btn-calculator" data-page="kalkulator_zysku.html">Kalkulator Zysku</a>
-                <a href="#" class="nav-button btn-generator" data-page="generator_ofert.html">Generator Ofert</a>
+            <div class="sidebar-header">
+                <h1>Narzędzia</h1>
             </div>
-            <div>
-                <h1>Kredyty</h1>
-                <a href="#" class="nav-button btn-loan" data-page="kalkulator_kredytowy.html">Kalkulator Kredytowy</a>
-                <a href="#" class="nav-button btn-sim" data-page="symulacje_klienta.html">Symulacje dla Klienta</a>
+            
+            <div class="nav-group">
+                <a href="#" class="nav-button btn-wps" data-page="kalkulator_wps.html">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> <span class="nav-text">Kalkulator WPS</span>
+                </a>
+                <a href="#" class="nav-button btn-analysis" data-page="analiza_umowy.html">
+                    <i class="fa-solid fa-file-signature"></i> <span class="nav-text">Analiza Umowy</span>
+                </a>
+                <a href="#" class="nav-button btn-calculator" data-page="kalkulator_zysku.html">
+                    <i class="fa-solid fa-chart-pie"></i> <span class="nav-text">Kalkulator Zysku</span>
+                </a>
+                <a href="#" class="nav-button btn-generator" data-page="generator_ofert.html">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span class="nav-text">Generator Ofert</span>
+                </a>
+            </div>
+            <div class="nav-group">
+                 <a href="#" class="nav-button btn-loan" data-page="kalkulator_kredytowy.html">
+                    <i class="fa-solid fa-calculator"></i> <span class="nav-text">Kalkulator Kredytowy</span>
+                </a>
+                <a href="#" class="nav-button btn-sim" data-page="symulacje_klienta.html">
+                    <i class="fa-solid fa-users"></i> <span class="nav-text">Symulacje dla Klienta</span>
+                </a>
+            </div>
+
+            <div class="sidebar-controls">
+                <button id="theme-toggle" class="control-button" title="Zmień motyw">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+                 <button id="sidebar-toggle" class="control-button" title="Zwiń/rozwiń menu">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
             </div>
         </nav>
-
+        
         <main id="content-area"></main>
     </div>
 
@@ -130,49 +224,74 @@
             let enteredPassword = prompt("Proszę podać hasło, aby uzyskać dostęp:");
             if (enteredPassword === correctPassword) {
                 document.getElementById("app-container").style.display = "flex";
+                 // KROK 4: Automatyczne kliknięcie pierwszego przycisku
+                document.querySelector('.nav-button').click();
             } else {
                 alert("Nieprawidłowe hasło.");
                 document.body.innerHTML = '<h1 style="text-align:center; margin-top: 50px;">Brak dostępu</h1>';
             }
         })();
 
-        // === NOWA, ZAAWANSOWANA LOGIKA POKAZYWANIA I UKRYWANIA RAMEK ===
         document.addEventListener('DOMContentLoaded', () => {
             const navButtons = document.querySelectorAll('.nav-button');
             const contentArea = document.getElementById('content-area');
 
             navButtons.forEach(button => {
                 button.addEventListener('click', (event) => {
-                    event.preventDefault(); // Blokujemy domyślną akcję linku
-
+                    event.preventDefault(); 
                     const pageUrl = button.getAttribute('data-page');
                     if (!pageUrl) return;
 
-                    // Podświetlanie aktywnego przycisku w menu
                     navButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
 
-                    // Ukrywanie wszystkich istniejących ramek
-                    document.querySelectorAll('.tool-frame').forEach(frame => {
-                        frame.classList.remove('active');
-                    });
-
-                    // Sprawdzanie, czy ramka dla tego narzędzia już istnieje
+                    document.querySelectorAll('.tool-frame').forEach(frame => frame.classList.remove('active'));
                     let frame = document.getElementById(pageUrl);
 
                     if (frame) {
-                        // Jeśli ramka istnieje, po prostu ją pokaż
                         frame.classList.add('active');
                     } else {
-                        // Jeśli ramka nie istnieje, stwórz ją, załaduj i pokaż
                         frame = document.createElement('iframe');
-                        frame.id = pageUrl; // Używamy URL jako unikalnego ID
-                        frame.className = 'tool-frame active'; // Nadajemy klasy, w tym 'active' by była widoczna
+                        frame.id = pageUrl;
+                        frame.className = 'tool-frame active';
                         frame.src = pageUrl;
-                        
-                        contentArea.appendChild(frame); // Dodajemy nową ramkę do kontenera
+                        contentArea.appendChild(frame);
                     }
                 });
+            });
+
+            // KROK 5: Logika chowanego menu
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const appContainer = document.getElementById('app-container');
+            const toggleIcon = sidebarToggle.querySelector('i');
+
+            sidebarToggle.addEventListener('click', () => {
+                appContainer.classList.toggle('sidebar-collapsed');
+                if (appContainer.classList.contains('sidebar-collapsed')) {
+                    toggleIcon.classList.remove('fa-chevron-left');
+                    toggleIcon.classList.add('fa-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('fa-chevron-right');
+                    toggleIcon.classList.add('fa-chevron-left');
+                }
+            });
+
+            // KROK 6: Logika zmiany motywu
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            // Przy ładowaniu strony, sprawdzamy zapisany motyw
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                // Zapisujemy wybór użytkownika
+                if (document.body.classList.contains('light-mode')) {
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    localStorage.setItem('theme', 'dark');
+                }
             });
         });
     </script>
